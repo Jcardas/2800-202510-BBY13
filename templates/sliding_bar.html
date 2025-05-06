@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Horizontal Collapsible Navbar</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    .horizontal-collapse {
+      position: fixed;
+      right: 0;
+      bottom: 33%;
+      width: 240px;
+      height: 60px;
+      background-color: #343a40;
+      border-radius: 30px 0 0 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      transform: translateX(calc(100% - 50px)); /* keep toggle icon visible */
+      transition: transform 0.3s ease-in-out;
+      z-index: 1050;
+    }
+
+    .horizontal-collapse.show {
+      transform: translateX(0);
+    }
+
+    .nav-icon {
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .toggle-icon {
+      font-size: 26px;
+      color: #ffc107;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Horizontal Collapsible Navbar -->
+<div class="horizontal-collapse" id="horizontalNav">
+  <i class="bi bi-chevron-double-left nav-icon toggle-icon" id="toggleIcon"></i>
+  <i class="bi bi-fonts nav-icon"></i>
+  <i class="bi bi-chevron-up nav-icon"></i>
+  <i class="bi bi-globe nav-icon"></i>
+  <i class="bi bi-mic nav-icon"></i>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.getElementById('toggleIcon').addEventListener('click', function () {
+    const nav = document.getElementById('horizontalNav');
+    nav.classList.toggle('show');
+    this.classList.toggle('bi-chevron-double-left');
+    this.classList.toggle('bi-chevron-double-right');
+  });
+</script>
+
+</body>
+</html>
