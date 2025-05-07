@@ -72,6 +72,11 @@ app.get("/signin", (req, res) => {
 }
 );
 
+app.get("/real-vs-ai", (req, res) => {
+  res.sendFile(__dirname + "/public/real-vs-ai.html");
+}
+);
+
 
 // Signup Form Submission
 app.post("/signup", async (req, res) => {
