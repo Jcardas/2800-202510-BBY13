@@ -54,12 +54,12 @@ app.get("/", (req, res) => {
       <a href="/logout">Logout</a>
     `);
   } else {
-    res.redirect("/index");
+    res.redirect("/home");
   }
 });
 
-app.get("/index", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+app.get("/home", (req, res) => {
+  res.sendFile(__dirname + "/public/home.html");
 }
 );
 
