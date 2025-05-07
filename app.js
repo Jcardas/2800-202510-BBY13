@@ -54,13 +54,24 @@ app.get("/", (req, res) => {
       <a href="/logout">Logout</a>
     `);
   } else {
-    res.send(`
-      <h1>Welcome!</h1>
-      <a href="/signup.html">Sign Up</a><br>
-      <a href="/signin.html">Log In</a>
-    `);
+    res.redirect("/index");
   }
 });
+
+app.get("/index", (req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
+}
+);
+
+app.get("/signup", (req, res) => {
+  res.sendFile(__dirname + "/public/signup.html");
+}
+);
+app.get("/signin", (req, res) => {
+  res.sendFile(__dirname + "/public/signin.html");
+}
+);
+
 
 // Signup Form Submission
 app.post("/signup", async (req, res) => {
@@ -131,12 +142,7 @@ app.get("/members", (req, res) => {
   if (!req.session.authenticated) {
     return res.redirect("/");
   }
-
-  res.send(`
-    <h1>Members Area</h1>
-    <p>Hello, ${req.session.username}!</p>
-    <a href="/logout">Logout</a>
-  `);
+  res.sendFile(__dirname + "/public/members.html");
 });
 
 // Logout
