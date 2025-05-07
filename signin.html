@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/public/scripts/navbar.js"></script>
+</head>
+
+<body class="bg-gray-100">
+    <header class=" text-black text-center py-4">
+        <div id="navbar"></div>
+    </header>
+
+    <main class="container mx-auto mt-8">
+        <!-- Page Title -->
+        <div>
+            <h1 class="text-lime-400 text-4xl font-bold text-left mb-12 ml-2">Sign in</h1>
+        </div>
+
+        <!-- Text -->
+        <div>
+            <p class="text-center mb-4">Sign in to your account or create one if you don't have an account.</p>
+        </div>
+
+        <!-- Sign in Form -->
+        <div class="flex justify-center">
+            <form action="/login" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-sm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
+                    <input type="text" id="username" name="username" autocomplete="username" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+                    <input type="password" id="password" name="password" autocomplete="current-password" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="submit"
+                        class="bg-gradient-to-r from-lime-400 to-lime-300 text-white font-bold py-2 px-4 rounded shadow hover:shadow-lg transition-shadow">Sign
+                        In</button>
+                    <a href="/signup"
+                        class="inline-block align-baseline font-bold text-sm text-lime-400 hover:text-lime-500">Create
+                        an account</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+
+</html>
