@@ -67,8 +67,8 @@ app.get("/signup", (req, res) => {
   res.sendFile(__dirname + "/public/signup.html");
 }
 );
-app.get("/signin", (req, res) => {
-  res.sendFile(__dirname + "/public/signin.html");
+app.get("/login", (req, res) => {
+  res.sendFile(__dirname + "/public/login.html");
 }
 );
 
@@ -111,8 +111,8 @@ app.post("/signup", async (req, res) => {
   res.redirect("/members");
 });
 
-// Signin Form Submission
-app.post("/signin", async (req, res) => {
+// Login Form Submission
+app.post("/login", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
@@ -123,17 +123,17 @@ app.post("/signin", async (req, res) => {
 
   const validation = schema.validate({ email, password });
   if (validation.error) {
-    return res.send("Invalid input. <a href='/signin.html'>Try again</a>");
+    return res.send("Invalid input. <a href='/login.html'>Try again</a>");
   }
 
   const user = await userCollection.findOne({ email });
   if (!user) {
-    return res.send("User not found. <a href='/signin.html'>Try again</a>");
+    return res.send("User not found. <a href='/login.html'>Try again</a>");
   }
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
-    return res.send("Incorrect password. <a href='/signin.html'>Try again</a>");
+    return res.send("Incorrect password. <a href='/login.html'>Try again</a>");
   }
 
   req.session.authenticated = true;
