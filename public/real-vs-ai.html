@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real vs AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/scripts/navbar.js"></script>
+</head>
+
+<body class="bg-gray-100">
+    <header class=" text-black text-center py-4">
+        <div id="navbar"></div>
+    </header>
+
+    <main class="container mx-auto mt-8">
+        <!-- Page Title -->
+        <div>
+            <h1 class="text-lime-400 text-4xl font-bold text-left mb-12 ml-2">Real vs AI</h1>
+        </div>
+
+        <!-- Images -->
+        <div class="flex justify-center gap-4 mb-8">
+            <img src="/public/real-hand.png" alt="Real Image" class="w-1/2 shadow">
+            <img src="/public/ai-hand.png" alt="AI Image" class="w-1/2 shadow">
+        </div>
+
+        <!-- Text -->
+        <div>
+            <p class="text-center mb-4">Can you spot the real photo from the AI-generated one in this game?</p>
+        </div>
+
+        <!-- Button -->
+        <div class="flex justify-center">
+            <button onclick="window.location.href='/real-vs-ai-game'"
+                class="bg-gradient-to-r from-lime-400 to-lime-300 text-white font-bold py-2 px-4 rounded shadow hover:shadow-lg transition-shadow">
+                Start Game
+            </button>
+        </div>
+    </main>
+</body>
+
+</html>
