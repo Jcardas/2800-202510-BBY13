@@ -8,6 +8,9 @@ const saltRounds = 12;
 const Joi = require("joi");
 const app = express();
 
+// Specify the view engine
+app.set('view engine', 'ejs');
+
 const PORT = process.env.PORT || 3000;
 const expireTime = 1 * 60 * 60 * 1000; // 1 hour
 
@@ -59,9 +62,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/home", (req, res) => {
-  res.sendFile(__dirname + "/public/home.html");
-}
-);
+  res.render("home", {
+    title: 'Colors'
+});
+});
 
 app.get("/signup", (req, res) => {
   res.sendFile(__dirname + "/public/signup.html");
