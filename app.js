@@ -68,7 +68,9 @@ app.get("/home", (req, res) => {
 });
 
 app.get("/signup", (req, res) => {
-  res.sendFile(__dirname + "/public/signup.html");
+  res.render("signup", {
+    title: 'Sign Up'
+  });
 }
 );
 app.get("/login", (req, res) => {
