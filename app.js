@@ -48,11 +48,8 @@ app.use(
 // Home Page
 app.get("/", (req, res) => {
   if (req.session.authenticated) {
-    return res.send(`
-      <h1>Welcome, ${req.session.username}!</h1>
-      <a href="/members">Members Area</a><br>
-      <a href="/logout">Logout</a>
-    `);
+    // If user is authenticated, show the home page as well (TODO: make a separate page)
+    res.redirect("/home");
   } else {
     res.redirect("/home");
   }
@@ -97,13 +94,13 @@ app.post("/signup", async (req, res) => {
 
   const validation = schema.validate({ username, email, password });
   if (validation.error) {
-    return res.send("Invalid input. <a href='/signup.html'>Try again</a>");
+    return res.send("Invalid input. <a href='/signup'>Try again</a>");
   }
 
   const existingUser = await userCollection.findOne({ email });
   if (existingUser) {
     return res.send(
-      "User already exists. <a href='/signup.html'>Try again</a>"
+      "User already exists. <a href='/signup'>Try again</a>"
     );
   }
 
@@ -113,7 +110,7 @@ app.post("/signup", async (req, res) => {
   req.session.authenticated = true;
   req.session.username = username;
 
-  res.redirect("/members");
+  res.redirect("/");
 });
 
 // Login Form Submission
@@ -128,32 +125,25 @@ app.post("/login", async (req, res) => {
 
   const validation = schema.validate({ email, password });
   if (validation.error) {
-    return res.send("Invalid input. <a href='/login.html'>Try again</a>");
+    return res.send("Invalid input. <a href='/login'>Try again</a>");
   }
 
   const user = await userCollection.findOne({ email });
   if (!user) {
-    return res.send("User not found. <a href='/login.html'>Try again</a>");
+    return res.send("User not found. <a href='/login'>Try again</a>");
   }
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
-    return res.send("Incorrect password. <a href='/login.html'>Try again</a>");
+    return res.send("Incorrect password. <a href='/login'>Try again</a>");
   }
 
   req.session.authenticated = true;
   req.session.username = user.username;
 
-  res.redirect("/members");
+  res.redirect("/");
 });
 
-// Members Page
-app.get("/members", (req, res) => {
-  if (!req.session.authenticated) {
-    return res.redirect("/");
-  }
-  res.sendFile(__dirname + "/public/members.html");
-});
 
 // Logout
 app.get("/logout", (req, res) => {
