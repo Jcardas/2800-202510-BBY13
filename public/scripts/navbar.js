@@ -1,5 +1,7 @@
+console.log('Navbar script loaded!');
+
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('templates/navbar.html')
+    fetch('/templates/navbar.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('navbar').innerHTML = data;
