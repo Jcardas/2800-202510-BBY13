@@ -13,7 +13,7 @@ let progressBarFull;
 
 
 
-// Function to highlight the selected image
+// Function to create outline around the selected image
 function selectImage(image) {
     if (!image || !(image instanceof HTMLElement)) {
         console.error('Invalid image element provided.');
@@ -28,11 +28,26 @@ function selectImage(image) {
     selectedImage.classList.add('outline', 'outline-4', 'outline-lime-400', 'rounded-lg');
 }
 
+// Function to clear the selection (remove the outline)
+function clearSelection()
+{
+    // if the element on the page is in the game-image class, remove the outline
+    const gameImages = document.querySelectorAll('.game-image');
+    gameImages.forEach(image => {
+        image.classList.remove('outline', 'outline-4', 'outline-lime-400', 'rounded-lg');
+    });
+    selectedImage = null;   
+}
+
+// Function to update the progress bar and round counter
+// This function will be called after each round
 function updateProgressBar() {
     const progressText = document.getElementById('progress-text');
 
     progressBarFull.style.width = `${(currentRound / totalRounds) * 100}%`;
     progressText.innerText = `Round ${currentRound}/${totalRounds}`;
+
+    clearSelection(); // Clear the selection after updating the progress bar
 }
 
 // Function to submit the answer 
@@ -43,6 +58,14 @@ function submitAnswer() {
     }
 
     const isReal = selectedImage.id === 'real-image';
+
+    if (isReal) {
+        // If the selected image is the real one, update the score
+        // score += 1; // Assuming you have a score variable to keep track of the score
+    } else {
+        // If the selected image is the AI-generated one, do not update the score
+    }
+
     alert(isReal ? 'Correct! You selected the real image.' : 'Wrong! That was the AI-generated image.');
 
     currentRound++;
@@ -56,6 +79,7 @@ function submitAnswer() {
     }
 }
 
+// Starts the timer based on the duration provided
 function startTimer(duration) {
     const timerElement = document.getElementById('timer');
     let timeRemaining = duration;
@@ -77,6 +101,7 @@ function startTimer(duration) {
     }, 1000);
 }
 
+// Starts the game when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     progressBarFull = document.getElementById('progress-bar-full');
     const tenMinutes = 10 * 60; // 10 minutes 
