@@ -15,13 +15,17 @@ let progressBarFull;
 
 // Function to highlight the selected image
 function selectImage(image) {
+    if (!image || !(image instanceof HTMLElement)) {
+        console.error('Invalid image element provided.');
+        return;
+    }
 
     // Make sure to remove the highlight from any previously selected image
     if (selectedImage) {
-        selectedImage.classList.remove('border-highlight');
+        selectedImage.classList.remove('outline', 'outline-4', 'outline-lime-400', 'rounded-lg');
     }
     selectedImage = image;
-    selectedImage.classList.add('border-highlight');
+    selectedImage.classList.add('outline', 'outline-4', 'outline-lime-400', 'rounded-lg');
 }
 
 function updateProgressBar() {
