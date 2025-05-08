@@ -161,7 +161,7 @@ app.use(express.static(__dirname + "/public"));
 // 404 Fallback
 app.get("/*dummy", (req, res) => {
   res.status(404);
-  res.send("Page not found - 404");
+  res.sendFile(__dirname + "/public/404.html");
 });
 
 // Start server
