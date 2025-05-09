@@ -67,7 +67,7 @@ function updateProgressBar() {
 }
 
 // Function to submit the answer 
-function submitAnswer() {
+async function submitAnswer() {
     if (!selectedImage) {
         alert('Please select an image before submitting your answer.');
         return;
@@ -88,8 +88,16 @@ function submitAnswer() {
     if (currentRound < totalRounds)
         {
             selectedImage = null;
-            updateProgressBar(); // Update progress bar and round counter
-            loadImages(); // Load new images for the next round
+            // Update progress bar and round counter
+            updateProgressBar();
+
+            // Load new images for the next round
+            await loadImages();
+
+            // Update the image srcs
+            document.getElementById('real-image').src = realImageUrl;
+            document.getElementById('ai-image').src = aiImageUrl;
+
     } else {
         window.location.href = '/leaderboard.html'; 
     }
