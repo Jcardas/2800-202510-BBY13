@@ -23,6 +23,7 @@ const NODE_SESSION_SECRET = process.env.NODE_SESSION_SECRET;
 // MongoDB client
 var { database } = require("./databaseConnection");
 const userCollection = database.db(MONGODB_DATABASE).collection("users");
+const imageCollection = database.db(MONGODB_DATABASE).collection("images");
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -143,6 +144,23 @@ app.post("/login", async (req, res) => {
 
   res.redirect("/");
 });
+
+// routs to get image urls from the database
+// might need to add middleware to check if user is authenticated to access this route (currently anyone can access it and see image urls)
+app.get("/api/image/:type", async (req, res) => {
+  const type = req.params.type;
+
+  if (type !== "real" && type !== "ai") {
+    return res.status(404).sendFile(__dirname + "/public/404.html");
+  }
+
+  const images = await imageCollection.find({ type }).toArray();
+  if (!images.length) return res.status(404).send("No images found");
+
+  const random = images[Math.floor(Math.random() * images.length)];
+  res.json({ url: random.url });
+});
+
 
 
 // Logout

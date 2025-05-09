@@ -11,6 +11,22 @@ let aiImageUrl = '';
 let selectedImage = null;
 let progressBarFull;
 
+// Function to load images from the database and display them on the page
+async function fetchImage(type) {
+    const response = await fetch(`/api/image/${type}`);
+    const data = await response.json();
+    return data.url;
+}
+  
+// Function to set the image URLs for the game
+// This function will be called when the game starts and after each round
+async function loadImages() {
+    realImageUrl = await fetchImage('real');
+    aiImageUrl = await fetchImage('ai');
+  
+    console.log("Real Image:", realImageUrl);
+    console.log("AI Image:", aiImageUrl);
+}
 
 
 // Function to create outline around the selected image
@@ -73,7 +89,7 @@ function submitAnswer() {
         {
             selectedImage = null;
             updateProgressBar(); // Update progress bar and round counter
-        //loadImages(); Function to load new images for the next round (not implemented)
+            loadImages(); // Load new images for the next round
     } else {
         window.location.href = '/leaderboard.html'; 
     }
@@ -102,12 +118,15 @@ function startTimer(duration) {
 }
 
 // Starts the game when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async() => {
     progressBarFull = document.getElementById('progress-bar-full');
     const tenMinutes = 10 * 60; // 10 minutes 
     startTimer(tenMinutes);
-    //loadImages(); Function to load images at the start of the game (not implemented)
+
+    await loadImages();  // Load images for the first round
     
+    document.getElementById('real-image').src = realImageUrl;
+    document.getElementById('ai-image').src = aiImageUrl;
 
     document.getElementById('real-image').addEventListener('click', function() {
         selectImage(this);
