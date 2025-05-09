@@ -11,27 +11,36 @@
         <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">About</a></li>
         <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">Services</a></li>
         <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">Contact</a></li>
-        <li>
-          <a href="#">
-            <img
-              src="/icons/account_circle_black.svg"
-              alt="Account"
-              class="w-8 h-8 inline-block hover:opacity-60 transition-opacity duration-200 ml-2"
-            />
-          </a>
-        </li>
+          <div class="flex items-center space-x-4">
+            <% if (user) { %>
+              <!-- Logged in state -->
+              <a href="/account" class="flex items-center">
+                <span class="hidden md:inline mr-2"><%= user.username %></span>
+                <img src="/icons/account_circle_black.svg" alt="Account" class="w-8 h-8 hover:opacity-60 transition-opacity duration-200">
+              </a>
+              <a href="/logout" class="hidden md:block hover:text-gray-600">Logout</a>
+              <% } else { %>
+                <!-- Logged out state -->
+                <div class="flex items-center space-x-4">
+                  <a href="/login" class="hover:text-gray-600">Login</a>
+                  <a href="/signup" class="bg-gradient-to-r 
+                  from-blue-400 
+                  to-blue-300 
+                  text-white 
+                  px-4 py-2 
+                  rounded 
+                  shadow 
+                  hover:shadow-lg 
+                  transition-shadow">
+                    Sign Up
+                  </a>
+                </div>
+              <% } %>
       </ul>
     </nav>
     
     <!-- Mobile menu button and account icon (hidden on desktop) -->
     <div class="flex items-center space-x-4 md:hidden">
-      <a href="#" class="block md:hidden">
-        <img
-          src="/icons/account_circle_black.svg"
-          alt="Account"
-          class="w-8 h-8 inline-block hover:opacity-60 transition-opacity duration-200"
-        />
-      </a>
       <button id="mobile-menu-button" class="focus:outline-none">
         <img
           src="/icons/menu_black.svg"
@@ -80,51 +89,34 @@
             <span>Contact</span>
           </a>
         </li>
-        <li>
-          <a href="#" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
-            <span>Account</span>
-            <img
-              src="/icons/account_circle_black.svg"
-              alt="Account"
-              class="w-6 h-6 inline-block ml-2"
-            />
-          </a>
-        </li>
+        <div class="">
+          <% if (user) { %>
+            <!-- Logged in state -->
+            <a href="/account" class="flex items-center">
+              <span class="hidden md:inline mr-2"><%= user.username %></span>
+              <img src="/icons/account_circle_black.svg" alt="Account" class="w-8 h-8 hover:opacity-60 transition-opacity duration-200">
+            </a>
+            <a href="/logout" class="hidden md:block hover:text-gray-600">Logout</a>
+            <% } else { %>
+              <!-- Logged out state - vertical buttons -->
+              <div class="flex flex-col space-y-2">
+                <a href="/login" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
+                  Login
+                </a>
+                <a href="/signup" class="bg-gradient-to-r 
+                from-blue-400 
+                to-blue-300 
+                text-white 
+                px-4 py-2 
+                rounded 
+                shadow 
+                hover:shadow-lg 
+                transition-shadow">
+                  Sign Up
+                </a>
+              </div>
+            <% } %>
       </ul>
     </nav>
   </div>
 </div>
-
-<script>
-  // Mobile menu toggle functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const closeMenuButton = document.getElementById('close-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const menuContainer = mobileMenu.querySelector('div');
-    
-    mobileMenuButton.addEventListener('click', function() {
-      mobileMenu.classList.remove('hidden');
-      setTimeout(() => {
-        menuContainer.classList.remove('translate-x-full');
-      }, 10);
-    });
-    
-    closeMenuButton.addEventListener('click', function() {
-      menuContainer.classList.add('translate-x-full');
-      setTimeout(() => {
-        mobileMenu.classList.add('hidden');
-      }, 300);
-    });
-    
-    // Close menu when clicking outside
-    mobileMenu.addEventListener('click', function(e) {
-      if (e.target === mobileMenu) {
-        menuContainer.classList.add('translate-x-full');
-        setTimeout(() => {
-          mobileMenu.classList.add('hidden');
-        }, 300);
-      }
-    });
-  });
-</script>
