@@ -74,7 +74,9 @@ app.get("/signup", (req, res) => {
 }
 );
 app.get("/login", (req, res) => {
-  res.sendFile(__dirname + "/public/login.html");
+  res.render("login", {
+    title: 'Log In'
+  });
 }
 );
 
@@ -172,7 +174,9 @@ app.use(express.static(__dirname + "/public"));
 // 404 Fallback
 app.get("/*dummy", (req, res) => {
   res.status(404);
-  res.sendFile(__dirname + "/public/404.html");
+  res.render("404", {
+    title: 'Page not found'
+})
 });
 
 // Start server
