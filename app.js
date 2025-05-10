@@ -167,7 +167,7 @@ app.post("/login", async (req, res) => {
   res.redirect("/");
 });
 
-// routs to get image urls from the database
+// routes to get image urls from the database
 // might need to add middleware to check if user is authenticated to access this route (currently anyone can access it and see image urls)
 app.get("/api/image/:type", async (req, res) => {
   const type = req.params.type;
