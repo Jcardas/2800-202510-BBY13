@@ -134,7 +134,6 @@ app.post("/signup", async (req, res) => {
   req.session.username = username;
 
   res.redirect("/");
-  res.redirect("/");
 });
 
 // Login Form Submission
