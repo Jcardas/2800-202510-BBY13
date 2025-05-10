@@ -24,10 +24,15 @@ const MONGODB_DATABASE = process.env.MONGODB_DATABASE;
 const NODE_SESSION_SECRET = process.env.NODE_SESSION_SECRET;
 
 // MongoDB client
-var { database } = require("./databaseConnection");
-const userCollection = database.db(MONGODB_DATABASE).collection("users");
-const imageCollection = database.db(MONGODB_DATABASE).collection("images");
+var { connectToDatabase } = require("./databaseConnection");
 
+let database, userCollection, imageCollection;
+
+(async () => {
+  database = await connectToDatabase();
+  userCollection = database.db(MONGODB_DATABASE).collection("users");
+  imageCollection = database.db(MONGODB_DATABASE).collection("images");
+})();
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 
