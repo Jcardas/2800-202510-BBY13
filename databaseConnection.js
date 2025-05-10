@@ -6,5 +6,11 @@ require('dotenv').config();
  
  const MongoClient = require("mongodb").MongoClient;
  const atlasURI = `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/?retryWrites=true`;
- var database = new MongoClient(atlasURI);
+ async function connectToDatabase() {
+     const client = new MongoClient(atlasURI);
+     await client.connect();
+     return client;
+ }
+ 
+ const database = connectToDatabase();
  module.exports = {database};
