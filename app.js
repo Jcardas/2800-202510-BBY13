@@ -58,13 +58,7 @@ app.use(
 app.get("/", (req, res) => {
   if (req.session.authenticated) {
     console.log("Authenticated user: " + req.session.username);
-    res.redirect("/home");
-  } else {
-    res.redirect("/home");
   }
-});
-
-app.get("/", (req, res) => {
   res.redirect("/home");
 });
 
