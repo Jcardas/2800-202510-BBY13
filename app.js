@@ -51,11 +51,7 @@ app.use(
 // Home Page
 app.get("/", (req, res) => {
   if (req.session.authenticated) {
-    return res.send(`
-      <h1>Welcome, ${req.session.username}!</h1>
-      <a href="/members">Members Area</a><br>
-      <a href="/logout">Logout</a>
-    `);
+    console.log("Authenticated user: " + req.session.username);
   } else {
     res.redirect("/home");
   }
@@ -64,7 +60,7 @@ app.get("/", (req, res) => {
 app.get("/home", (req, res) => {
   res.render("home", {
     title: 'Home'
-});
+  });
 });
 
 app.get("/signup", (req, res) => {
@@ -81,15 +77,25 @@ app.get("/login", (req, res) => {
 );
 
 app.get("/real-vs-ai", (req, res) => {
-  res.sendFile(__dirname + "/public/real-vs-ai.html");
+  res.render("real-vs-ai", {
+    title: 'Real vs AI'
+  });
 }
 );
 
 app.get("/real-vs-ai-game", (req, res) => {
-  res.sendFile(__dirname + "/public/real-vs-ai-game.html");
+  res.render("real-vs-ai-game", {
+    title: 'Real vs AI Game'
+  });
 }
 );
 
+app.get("/about", (req, res) => {
+  res.render("about", {
+    title: 'About Us'
+  });
+}
+);
 
 // Signup Form Submission
 app.post("/signup", async (req, res) => {
@@ -105,13 +111,13 @@ app.post("/signup", async (req, res) => {
 
   const validation = schema.validate({ username, email, password });
   if (validation.error) {
-    return res.send("Invalid input. <a href='/signup.html'>Try again</a>");
+    return res.send("Invalid input. IMPLEMENT THIS PAGE");
   }
 
   const existingUser = await userCollection.findOne({ email });
   if (existingUser) {
     return res.send(
-      "User already exists. <a href='/signup.html'>Try again</a>"
+      "User already exists. IMPLEMENT THIS PAGE"
     );
   }
 
@@ -121,7 +127,7 @@ app.post("/signup", async (req, res) => {
   req.session.authenticated = true;
   req.session.username = username;
 
-  res.redirect("/members");
+  res.redirect("/");
 });
 
 // Login Form Submission
@@ -136,31 +142,23 @@ app.post("/login", async (req, res) => {
 
   const validation = schema.validate({ email, password });
   if (validation.error) {
-    return res.send("Invalid input. <a href='/login.html'>Try again</a>");
+    return res.send("Invalid input. IMPLEMENT THIS PAGE");
   }
 
   const user = await userCollection.findOne({ email });
   if (!user) {
-    return res.send("User not found. <a href='/login.html'>Try again</a>");
+    return res.send("User not found. IMPLEMENT THIS PAGE");
   }
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
-    return res.send("Incorrect password. <a href='/login.html'>Try again</a>");
+    return res.send("Incorrect password. IMPLEMENT THIS PAGE");
   }
 
   req.session.authenticated = true;
   req.session.username = user.username;
 
-  res.redirect("/members");
-});
-
-// Members Page
-app.get("/members", (req, res) => {
-  if (!req.session.authenticated) {
-    return res.redirect("/");
-  }
-  res.sendFile(__dirname + "/public/members.html");
+  res.redirect("/");
 });
 
 // Logout
@@ -176,7 +174,7 @@ app.get("/*dummy", (req, res) => {
   res.status(404);
   res.render("404", {
     title: 'Page not found'
-})
+  })
 });
 
 // Start server

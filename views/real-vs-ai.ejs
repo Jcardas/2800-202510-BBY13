@@ -1,0 +1,37 @@
+<%- include("partials/header") %>
+    <!-- Navbar -->
+    <%- include("partials/navbar") %>
+
+    <main class="container mx-auto mt-8">
+      <!-- Page Title -->
+      <div>
+        <h1 class="text-lime-400 text-4xl font-bold text-left mb-12 ml-2">
+          Real vs AI
+        </h1>
+      </div>
+
+      <!-- Images -->
+      <div class="flex justify-center gap-4 mb-8">
+        <img src="/real-hand.png" alt="Real Image" class="w-1/2 shadow" />
+        <img src="/ai-hand.png" alt="AI Image" class="w-1/2 shadow" />
+      </div>
+
+      <!-- Text -->
+      <div>
+        <p class="text-center mb-4">
+          Can you spot the real photo from the AI-generated one in this game?
+        </p>
+      </div>
+
+      <!-- Button -->
+      <div class="flex justify-center">
+        <button
+          class="bg-gradient-to-r from-lime-400 to-lime-300 text-white font-bold py-2 px-4 rounded shadow hover:shadow-lg transition-shadow"
+        >
+          <a href="/real-vs-ai-game"> Start Game </a>
+        </button>
+      </div>
+    </main>
+
+<!-- Footer -->
+<%- include("partials/footer") %>
