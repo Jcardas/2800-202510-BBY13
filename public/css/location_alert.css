@@ -1,0 +1,36 @@
+.scrolling-banner {
+    position: fixed;
+    top: 60px;
+    width: 100%;
+    color: black;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    z-index: 9999;
+    padding: 8px 0;
+}
+
+.scrolling-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll-left 15s linear infinite;
+    font-size: 4vw;
+    /* Responsive text size */
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(0%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Optional: limit font size for large screens */
+@media (min-width: 768px) {
+    .scrolling-text {
+        font-size: 24px;
+    }
+}
