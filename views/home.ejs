@@ -1,0 +1,59 @@
+<%- include("partials/header") %>
+    <!-- Navbar -->
+    <%- include("partials/navbar") %>
+    <%- include("partials/location_alert") %>
+
+    <!-- Accessibility Sliding Bar -->
+    <%- include("partials/sliding_bar") %>
+    
+    <main class="container mx-auto mt-8 flex-grow ">
+
+
+        <h1 class="text-black text-4xl font-bold text-left mb-12 ml-2">Home</h1>
+
+        <!-- Games Button -->
+        <div class="flex justify-center mb-8">
+            <button>
+                <a href="/real-vs-ai" class="bg-gradient-to-r 
+            from-lime-400 to-lime-300 text-white 
+            text-2xl font-bold py-4 px-12 
+            rounded 
+            shadow 
+            hover:shadow-lg 
+            transition-shadow">
+                    Games
+                </a>
+            </button>
+        </div>
+
+        <p class="text-xl text-center p-4">Learn about AI scams through our interactive games!</p>
+
+        <!-- Sign up / Log in buttons -->
+        <div class="flex justify-center mt-8 mb-8 gap-12">
+            <button>
+                <a href="/signup" class="bg-gradient-to-r 
+            from-blue-400 to-blue-300 text-white 
+            text-2xl font-bold py-4 px-12 
+            rounded 
+            shadow 
+            hover:shadow-lg 
+            transition-shadow">
+                    Sign Up
+                </a>
+            </button>
+
+            <button>
+                <a href="/login" class="bg-gray-400 text-white 
+            text-2xl font-bold py-4 px-12 
+            rounded 
+            shadow 
+            hover:shadow-lg 
+            transition-shadow">
+                    Log In
+                </a>
+            </Button>
+        </div>
+    </main>
+
+<!-- Footer -->
+<%- include("partials/footer") %>

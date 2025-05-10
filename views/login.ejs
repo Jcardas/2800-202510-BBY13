@@ -1,0 +1,54 @@
+<%- include("partials/header") %>
+    <!-- Navbar -->
+    <%- include("partials/navbar") %>
+    
+    <!-- Accessibility Sliding Bar -->
+    <%- include("partials/sliding_bar") %>
+
+    <main class="container mx-auto mt-8">
+        <!-- Page Title -->
+        <div>
+            <h1 class="text-gray-400 text-4xl font-bold text-left mb-12 ml-2">
+                Log in
+            </h1>
+        </div>
+
+        <!-- Text -->
+        <div>
+            <p class="text-center mb-4">
+                Log in to your account or create one if you don't have an account.
+            </p>
+        </div>
+
+        <!-- Log in Form -->
+        <div class="flex justify-center">
+            <form action="/login" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-sm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+                    <input type="email" id="email" name="email" autocomplete="email" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+                    <input type="password" id="password" name="password" autocomplete="current-password" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="submit"
+                        class="bg-gray-400 text-white font-bold py-2 px-4 rounded shadow hover:shadow-lg transition-shadow">
+                        Log In
+                    </button>
+                    <a href="/signup"
+                        class="inline-block align-baseline font-bold text-sm text-gray-400 hover:text-blue-500">Create
+                        an account</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- <div>
+            <p id="error"></p>
+        </div> -->
+    </main>
+
+<!-- Footer -->
+<%- include("partials/footer") %>
