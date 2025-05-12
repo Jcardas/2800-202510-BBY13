@@ -38,10 +38,10 @@ function selectImage(image) {
 
     // Make sure to remove the highlight from any previously selected image
     if (selectedImage) {
-        selectedImage.classList.remove('outline', 'outline-4', 'outline-lime-400', 'rounded-lg', 'shadow-lg');
+        selectedImage.classList.remove('outline', 'outline-8', 'outline-lime-400', 'rounded-lg', 'shadow-lg');
     }
     selectedImage = image;
-    selectedImage.classList.add('outline', 'outline-4', 'outline-lime-400', 'rounded-lg', 'shadow-lg');
+    selectedImage.classList.add('outline', 'outline-8', 'outline-lime-400', 'rounded-lg', 'shadow-lg');
 }
 
 // Function to clear the selection (remove the outline)
@@ -50,7 +50,7 @@ function clearSelection()
     // if the element on the page is in the game-image class, remove the outline
     const gameImages = document.querySelectorAll('.game-image');
     gameImages.forEach(image => {
-        image.classList.remove('outline', 'outline-4', 'outline-lime-400', 'rounded-lg');
+        image.classList.remove('outline', 'outline-8', 'outline-lime-400', 'rounded-lg');
     });
     selectedImage = null;   
 }
