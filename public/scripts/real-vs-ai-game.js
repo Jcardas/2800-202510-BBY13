@@ -5,6 +5,7 @@
 const totalRounds = 10; 
 let currentRound = 0;
 
+let score = 0; // Initialize score variable
 
 // Where we will store the image URLs each round
 let realImageUrl = '';
@@ -12,7 +13,7 @@ let aiImageUrl = '';
 
 // This will be updated to be either game-image1 or game-image2
 // depending on which one is the real image 
-var realImage = null;
+let realImage = null;
 
 let selectedImage = null;
 let progressBarFull;
@@ -81,26 +82,38 @@ async function submitAnswer() {
 
     if (isReal) {
         // If the selected image is the real one, update the score
-        // score += 1; // Assuming you have a score variable to keep track of the score
-    } else {
-        // If the selected image is the AI-generated one, do not update the score
+        score += 1;
     }
 
-    alert(isReal ? 'Correct! You selected the real image.' : 'Wrong! That was the AI-generated image.');
+    roundAlert(isReal); // Show the round alert based on the user's selection
+}
 
+// Function to change the text of the round popup based on if the user is correct or not
+function roundAlert(isReal) {
+
+    // un hidden the popup
+    const popup = document.getElementById('popup');
+    popup.classList.remove('hidden');
+
+    const popupTitle = document.getElementById('popup-title');
+    popupTitle.innerText = isReal ? 'Correct!' : 'Wrong!';
+
+    const popupMessage = document.getElementById('popup-message');
+    popupMessage.innerText = isReal ? 'You selected the real image!' : 'That was the AI-generated image.';
+}
+
+function closePopup() {
+    const popup = document.getElementById('popup');
+    popup.classList.add('hidden');
+}
+
+// Function to go to the next round
+function nextRound() {
     currentRound++;
-    if (currentRound < totalRounds)
-        {
-            selectedImage = null;
-            // Update progress bar and round counter
-            updateProgressBar();
-
-            // Load new images for the next round
-            await loadImages();
-
-            // Update the image srcs
-            refreshImages();
-
+    if (currentRound < totalRounds) {
+        updateProgressBar();
+        refreshImages();
+        closePopup(); // Close the popup after the user clicks next
     } else {
         window.location.href = '/leaderboard.html'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
     }
@@ -167,6 +180,8 @@ document.addEventListener('DOMContentLoaded', async() => {
     });
 
     document.getElementById('submit-answer').addEventListener('click', submitAnswer);
+
+    document.getElementById('next-button').addEventListener('click',  nextRound);
 
     progressBarFull.style.width = '0%'; 
 });
