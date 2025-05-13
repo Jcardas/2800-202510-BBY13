@@ -24,15 +24,10 @@ const MONGODB_DATABASE = process.env.MONGODB_DATABASE;
 const NODE_SESSION_SECRET = process.env.NODE_SESSION_SECRET;
 
 // MongoDB client
-var { connectToDatabase } = require("./databaseConnection");
+var { database } = require("./databaseConnection");
+const userCollection = database.db(MONGODB_DATABASE).collection("users");
+const imageCollection = database.db(MONGODB_DATABASE).collection("images");
 
-let database, userCollection, imageCollection;
-
-(async () => {
-  database = await connectToDatabase();
-  userCollection = database.db(MONGODB_DATABASE).collection("users");
-  imageCollection = database.db(MONGODB_DATABASE).collection("images");
-})();
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 
@@ -172,7 +167,7 @@ app.get("/api/image/:type", async (req, res) => {
   const type = req.params.type;
 
   if (type !== "real" && type !== "ai") {
-    return res.status(404).sendFile(__dirname + "/public/404.html");
+    return res.status(404).sendFile(__dirname + "/404");
   }
 
   const images = await imageCollection.find({ type }).toArray();
@@ -181,6 +176,40 @@ app.get("/api/image/:type", async (req, res) => {
   const random = images[Math.floor(Math.random() * images.length)];
   res.json({ url: random.url });
 });
+
+//Creating scammer joke with ChatGPT API
+const OpenAI = require("openai");
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+
+app.get("/api/joke", async (req, res) => {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: "You are a witty assistant who tells short jokes about online scammers.",
+        },
+        {
+          role: "user",
+          content: "Tell me a joke about scammers.",
+        },
+      ],
+      temperature: 0.8,
+    });
+
+    const joke = completion.choices[0].message.content;
+    res.json({ joke });
+  } catch (error) {
+    console.error("Error generating joke:", error);
+    res.status(500).json({ error: "Failed to get joke" });
+  }
+});
+
 
 
 
@@ -204,3 +233,5 @@ app.get("/*dummy", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+

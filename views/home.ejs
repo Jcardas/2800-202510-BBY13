@@ -6,9 +6,8 @@
     <!-- Accessibility Sliding Bar -->
     <%- include("partials/sliding_bar") %>
     
-    <main class="container mx-auto mt-8 flex-grow ">
-
-
+    <main class="container mx-auto mt-8 flex-grow">
+        <!-- Page Title -->
         <h1 class="text-black text-4xl font-bold text-left mb-12 ml-2">Home</h1>
 
         <!-- Games Button -->
@@ -53,6 +52,15 @@
                 </a>
             </Button>
         </div>
+
+        <!--AI Joke Generating Button-->
+        <div class="joke-section">
+            <button onclick="getScamJoke()" class="joke-button">
+                Get a Scam Joke
+            </button>
+            <p id="joke-output" class="joke-output"></p>
+        </div>
+
     </main>
 
 <!-- Footer -->
