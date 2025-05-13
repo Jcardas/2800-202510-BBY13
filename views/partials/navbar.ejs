@@ -7,10 +7,10 @@
     <!-- Desktop navigation (hidden on mobile) -->
     <nav class="hidden md:block">
       <ul class="flex items-center space-x-6">
-        <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">Home</a></li>
-        <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">About</a></li>
-        <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">Services</a></li>
-        <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">Contact</a></li>
+        <li><a href="/" class="hover:text-gray-600 transition-colors duration-200">Home</a></li>
+        <li><a href="/about" class="hover:text-gray-600 transition-colors duration-200">About</a></li>
+        <li><a href="/services" class="hover:text-gray-600 transition-colors duration-200">Services</a></li>
+        <li><a href="/contact" class="hover:text-gray-600 transition-colors duration-200">Contact</a></li>
           <div class="flex items-center space-x-4">
             <% if (user) { %>
               <!-- Logged in state -->
@@ -45,7 +45,7 @@
         <img
           src="/icons/menu_black.svg"
           alt="Menu"
-          class="w-8 h-8 inline-block hover:opacity-60 transition-opacity duration-200"
+          class="w-10 h-10 inline-block hover:opacity-60 transition-opacity duration-200"
         />
       </button>
     </div>
@@ -61,7 +61,7 @@
         <img
           src="/icons/close_black.svg"
           alt="Close"
-          class="w-8 h-8 inline-block hover:opacity-60 transition-opacity duration-200"
+          class="w-6 h-6 inline-block hover:opacity-60 transition-opacity duration-200"
         />
       </button>
     </div>
@@ -70,22 +70,22 @@
     <nav class="p-4">
       <ul class="space-y-4">
         <li>
-          <a href="#" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
+          <a href="/" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
             <span>Home</span>
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
+          <a href="/about" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
             <span>About</span>
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
+          <a href="/services" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
             <span>Services</span>
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
+          <a href="/contact" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
             <span>Contact</span>
           </a>
         </li>
