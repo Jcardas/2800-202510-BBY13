@@ -1,13 +1,13 @@
 console.log('Navbar script loaded!');
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('/templates/navbar.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('navbar').innerHTML = data;
-        })
-        .catch(error => console.error('Error loading navbar:', error));
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     fetch('/templates/navbar.html')
+//         .then(response => response.text())
+//         .then(data => {
+//             document.getElementById('navbar').innerHTML = data;
+//         })
+//         .catch(error => console.error('Error loading navbar:', error));
+// });
 
   // Mobile menu toggle functionality
   document.addEventListener('DOMContentLoaded', function() {

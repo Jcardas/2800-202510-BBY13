@@ -11,7 +11,7 @@
         <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">About</a></li>
         <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">Services</a></li>
         <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">Contact</a></li>
-          <div class="flex items-center space-x-6">
+          <div class="flex items-center space-x-4">
             <% if (user) { %>
               <!-- Logged in state -->
               <a href="/account" class="flex items-center">
@@ -99,14 +99,15 @@
             <a href="/logout" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">Logout</a>
             <% } else { %>
               <!-- Logged out state - vertical buttons -->
-              <div class="flex flex-col space-y-2">
+              <div class="flex flex-col space-y-4">
                 <a href="/login" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
                   Login
                 </a>
                 <a href="/signup" class="bg-gradient-to-r 
                 from-blue-400 
                 to-blue-300 
-                text-white 
+                text-white
+                text-lg 
                 px-4 py-2 
                 rounded 
                 shadow 
