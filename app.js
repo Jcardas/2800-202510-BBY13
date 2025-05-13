@@ -47,6 +47,38 @@ app.use(
   })
 );
 
+// Middleware functions
+
+// Middleware to check if user is authenticated (logged in)
+function isAuthenticated(req, res, next) {
+  if (req.session.authenticated) {
+    return next();
+  } else {
+    res.redirect("/login");
+  }
+}
+
+// Middleware to check if the logged in user is an admin
+function isAdmin(req, res, next) {
+  if (req.session.role === "admin") {
+    return next();
+  } else {
+    return res.status(403).render("404");
+  }
+}
+
+// Middleware to check if the request is coming from the game page
+function fromGamePage(req, res, next) {
+  const referer = req.get("referer") || "";
+
+  if (referer.includes("/real-vs-ai-game")) {
+    return next(); // Allow access if request came from the game
+  }
+
+  // if not coming from game page, then this page does not exist
+  return res.status(404).render("404");
+}
+
 // Routes
 
 // Home Page
@@ -122,10 +154,11 @@ app.post("/signup", async (req, res) => {
   }
 
   const hashed = await bcrypt.hash(password, saltRounds);
-  await userCollection.insertOne({ username, email, password: hashed });
+  await userCollection.insertOne({ username, email, password: hashed, role: "user" });
 
   req.session.authenticated = true;
   req.session.username = username;
+  req.session.role = "user";
 
   res.redirect("/");
 });
@@ -157,17 +190,18 @@ app.post("/login", async (req, res) => {
 
   req.session.authenticated = true;
   req.session.username = user.username;
+  req.session.role = user.role;
 
   res.redirect("/");
 });
 
 // routes to get image urls from the database
 // might need to add middleware to check if user is authenticated to access this route (currently anyone can access it and see image urls)
-app.get("/api/image/:type", async (req, res) => {
+app.get("/api/image/:type", fromGamePage, async (req, res) => {
   const type = req.params.type;
 
   if (type !== "real" && type !== "ai") {
-    return res.status(404).sendFile(__dirname + "/public/404.html");
+    return res.status(404).render("404");
   }
 
   const images = await imageCollection.find({ type }).toArray();
@@ -177,7 +211,7 @@ app.get("/api/image/:type", async (req, res) => {
   res.json({ url: random.url });
 });
 
-app.get("/admin", (req, res) => {
+app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
   res.render("admin");
 });
 
