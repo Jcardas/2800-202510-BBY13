@@ -2,7 +2,7 @@
 // Keep track of score after each round
 
 // Function to provide hints (For now, hints will be linked to the round)
-const totalRounds = 10; 
+const totalRounds = 10;
 let currentRound = 0;
 
 let score = 0; // Initialize score variable
@@ -18,13 +18,37 @@ let realImage = null;
 let selectedImage = null;
 let progressBarFull;
 
+
+
+
+// stores images that have already been used
+let usedImages = [];
+
+// Update with the size of the images in the database (This feature may be hard to scale tbh)
+const IMAGES_SIZE = 4;
+
+
 // Function to load images from the database and display them on the page
 async function fetchImage(type) {
     const response = await fetch(`/api/image/${type}`);
     const data = await response.json();
+
+    // Check if the image URL is already used
+    if (usedImages.includes(data.url)) {
+        // If the image is already used, fetch a new one, if there are no more images, return a placeholder image
+        if (usedImages.length >= IMAGES_SIZE) {
+            console.log('Image databank exhausted, using placeholder image.');
+            return '/placeholder.png'; // Placeholder image URL
+        }
+        console.log(`Image already used: trying again...`);
+        // Recursively call fetchImage to get a new image
+        return fetchImage(type);
+    }
+    // Add the image URL to the used images array
+    usedImages.push(data.url);
     return data.url;
 }
-  
+
 // Function to set the image URLs for the game
 // This function will be called when the game starts and after each round
 async function loadImages() {
@@ -49,14 +73,13 @@ function selectImage(image) {
 }
 
 // Function to clear the selection (remove the outline)
-function clearSelection()
-{
+function clearSelection() {
     // if the element on the page is in the game-image class, remove the outline
     const gameImages = document.querySelectorAll('.game-image');
     gameImages.forEach(image => {
         image.classList.remove('outline', 'outline-8', 'outline-lime-400', 'rounded-lg');
     });
-    selectedImage = null;   
+    selectedImage = null;
 }
 
 // Function to update the progress bar and round counter
@@ -65,7 +88,7 @@ function updateProgressBar() {
     const progressText = document.getElementById('progress-text');
 
     progressBarFull.style.width = `${(currentRound / totalRounds) * 100}%`;
-    progressText.innerText = `Round ${currentRound + 1}/${totalRounds}`; 
+    progressText.innerText = `Round ${currentRound + 1}/${totalRounds}`;
 
     clearSelection(); // Clear the selection after updating the progress bar
 }
@@ -121,7 +144,10 @@ function nextRound() {
 
 // Function to refresh the images (game-image1 and game-image2) 
 // by randomly selecting which image to be the real one.
-function refreshImages() {
+async function refreshImages() {
+
+    await loadImages(); // Load new images for the next round
+
     const randomIndex = Math.floor(Math.random() * 2);
     const gameImage1 = document.getElementById('game-image1');
     const gameImage2 = document.getElementById('game-image2');
@@ -162,26 +188,24 @@ function startTimer(duration) {
 }
 
 // Starts the game when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', async() => {
+document.addEventListener('DOMContentLoaded', async () => {
     progressBarFull = document.getElementById('progress-bar-full');
     const tenMinutes = 10 * 60; // 10 minutes 
     startTimer(tenMinutes);
 
-    await loadImages();  // Load images for the first round
-    
     refreshImages(); // Refresh the images to display them on the page
 
-    document.getElementById('game-image1').addEventListener('click', function() {
+    document.getElementById('game-image1').addEventListener('click', function () {
         selectImage(this);
     });
 
-    document.getElementById('game-image2').addEventListener('click', function() {
+    document.getElementById('game-image2').addEventListener('click', function () {
         selectImage(this);
     });
 
     document.getElementById('submit-answer').addEventListener('click', submitAnswer);
 
-    document.getElementById('next-button').addEventListener('click',  nextRound);
+    document.getElementById('next-button').addEventListener('click', nextRound);
 
-    progressBarFull.style.width = '0%'; 
+    progressBarFull.style.width = '0%';
 });
