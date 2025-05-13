@@ -25,7 +25,7 @@ let progressBarFull;
 let usedImages = [];
 
 // Update with the size of the images in the database (This feature may be hard to scale tbh)
-const IMAGES_SIZE = 4;
+const IMAGES_SIZE = 20;
 
 
 // Function to load images from the database and display them on the page
