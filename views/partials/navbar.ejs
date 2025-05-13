@@ -11,12 +11,12 @@
         <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">About</a></li>
         <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">Services</a></li>
         <li><a href="#" class="hover:text-gray-600 transition-colors duration-200">Contact</a></li>
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-6">
             <% if (user) { %>
               <!-- Logged in state -->
               <a href="/account" class="flex items-center">
-                <span class="hidden md:inline mr-2"><%= user.username %></span>
-                <img src="/icons/account_circle_black.svg" alt="Account" class="w-8 h-8 hover:opacity-60 transition-opacity duration-200">
+                <span class="md:inline mr-2">Account</span>
+                <!-- <img src="/icons/account_circle_black.svg" alt="Account" class="w-8 h-8 hover:opacity-60 transition-opacity duration-200"> -->
               </a>
               <a href="/logout" class="hidden md:block hover:text-gray-600">Logout</a>
               <% } else { %>
@@ -89,14 +89,14 @@
             <span>Contact</span>
           </a>
         </li>
-        <div class="">
+        <div class="space-y-4">
           <% if (user) { %>
             <!-- Logged in state -->
-            <a href="/account" class="flex items-center">
-              <span class="hidden md:inline mr-2"><%= user.username %></span>
+            <a href="/account" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
+              <span class="md:inline mr-2">Account</span>
               <img src="/icons/account_circle_black.svg" alt="Account" class="w-8 h-8 hover:opacity-60 transition-opacity duration-200">
             </a>
-            <a href="/logout" class="hidden md:block hover:text-gray-600">Logout</a>
+            <a href="/logout" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">Logout</a>
             <% } else { %>
               <!-- Logged out state - vertical buttons -->
               <div class="flex flex-col space-y-2">
