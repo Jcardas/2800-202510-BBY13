@@ -5,6 +5,9 @@
 const totalRounds = 10;
 let currentRound = 0;
 
+let nextRealImageUrl = '';
+let nextAiImageUrl = '';
+
 let score = 0; // Initialize score variable
 
 // Where we will store the image URLs each round
@@ -55,6 +58,46 @@ async function loadImages() {
     realImageUrl = await fetchImage('real');
     aiImageUrl = await fetchImage('ai');
 }
+
+// Function to preload the next 2 images
+async function preloadNextImages() {
+    nextRealImageUrl = await fetchImage('real');
+    nextAiImageUrl = await fetchImage('ai');
+}
+
+// Function to refresh the images (game-image1 and game-image2) 
+// by randomly selecting which image to be the real one.
+async function refreshImages() {
+
+    // Preload the next round's images
+    await preloadNextImages();
+
+    console.log('Real Image URL:', realImageUrl);
+    console.log('AI Image URL:', aiImageUrl);
+
+    // Randomly assign images to game-image1 and game-image2
+    const randomIndex = Math.floor(Math.random() * 2);
+    const gameImage1 = document.getElementById('game-image1');
+    const gameImage2 = document.getElementById('game-image2');
+
+    if (randomIndex === 0) {
+        gameImage1.src = realImageUrl;
+        gameImage2.src = aiImageUrl;
+
+        realImage = 'game-image1'; // Set the real image to game-image1
+    } else {
+        gameImage1.src = aiImageUrl;
+        gameImage2.src = realImageUrl;
+
+        realImage = 'game-image2'; // Set the real image to game-image2
+    }
+        // Use preloaded images for the next round
+    realImageUrl = nextRealImageUrl;
+    aiImageUrl = nextAiImageUrl;
+
+    console.log('here!');
+}
+
 
 
 // Function to create outline around the selected image
@@ -142,29 +185,6 @@ function nextRound() {
     }
 }
 
-// Function to refresh the images (game-image1 and game-image2) 
-// by randomly selecting which image to be the real one.
-async function refreshImages() {
-
-    await loadImages(); // Load new images for the next round
-
-    const randomIndex = Math.floor(Math.random() * 2);
-    const gameImage1 = document.getElementById('game-image1');
-    const gameImage2 = document.getElementById('game-image2');
-
-    if (randomIndex === 0) {
-        gameImage1.src = realImageUrl;
-        gameImage2.src = aiImageUrl;
-
-        realImage = 'game-image1'; // Set the real image to game-image1
-    } else {
-        gameImage1.src = aiImageUrl;
-        gameImage2.src = realImageUrl;
-
-        realImage = 'game-image2'; // Set the real image to game-image2
-    }
-}
-
 // Starts the timer based on the duration provided
 function startTimer(duration) {
     const timerElement = document.getElementById('timer');
@@ -192,6 +212,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     progressBarFull = document.getElementById('progress-bar-full');
     const tenMinutes = 10 * 60; // 10 minutes 
     startTimer(tenMinutes);
+
+    // Preload the first set of images
+    await loadImages();
 
     refreshImages(); // Refresh the images to display them on the page
 
