@@ -167,7 +167,7 @@ app.get("/api/image/:type", async (req, res) => {
   const type = req.params.type;
 
   if (type !== "real" && type !== "ai") {
-    return res.status(404).sendFile(__dirname + "/public/404.html");
+    return res.status(404).sendFile(__dirname + "/404");
   }
 
   const images = await imageCollection.find({ type }).toArray();

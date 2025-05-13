@@ -1,5 +1,6 @@
 // TODO: Upload the images to the page and create a function to load them
 // Keep track of score after each round
+
 // Function to provide hints (For now, hints will be linked to the round)
 const totalRounds = 10; 
 let currentRound = 0;
@@ -8,6 +9,11 @@ let currentRound = 0;
 // Where we will store the image URLs each round
 let realImageUrl = '';
 let aiImageUrl = '';
+
+// This will be updated to be either game-image1 or game-image2
+// depending on which one is the real image 
+var realImage = null;
+
 let selectedImage = null;
 let progressBarFull;
 
@@ -61,7 +67,7 @@ function updateProgressBar() {
     const progressText = document.getElementById('progress-text');
 
     progressBarFull.style.width = `${(currentRound / totalRounds) * 100}%`;
-    progressText.innerText = `Round ${currentRound}/${totalRounds}`;
+    progressText.innerText = `Round ${currentRound + 1}/${totalRounds}`; 
 
     clearSelection(); // Clear the selection after updating the progress bar
 }
@@ -73,7 +79,8 @@ async function submitAnswer() {
         return;
     }
 
-    const isReal = selectedImage.id === 'real-image';
+    // Check if the selected image is the real one, this is set in the refreshImages function
+    const isReal = selectedImage.id === realImage;
 
     if (isReal) {
         // If the selected image is the real one, update the score
@@ -95,11 +102,30 @@ async function submitAnswer() {
             await loadImages();
 
             // Update the image srcs
-            document.getElementById('real-image').src = realImageUrl;
-            document.getElementById('ai-image').src = aiImageUrl;
+            refreshImages();
 
     } else {
-        window.location.href = '/leaderboard.html'; 
+        window.location.href = '/leaderboard.html'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
+    }
+}
+
+// Function to refresh the images (game-image1 and game-image2) 
+// by randomly selecting which image to be the real one.
+function refreshImages() {
+    const randomIndex = Math.floor(Math.random() * 2);
+    const gameImage1 = document.getElementById('game-image1');
+    const gameImage2 = document.getElementById('game-image2');
+
+    if (randomIndex === 0) {
+        gameImage1.src = realImageUrl;
+        gameImage2.src = aiImageUrl;
+
+        realImage = 'game-image1'; // Set the real image to game-image1
+    } else {
+        gameImage1.src = aiImageUrl;
+        gameImage2.src = realImageUrl;
+
+        realImage = 'game-image2'; // Set the real image to game-image2
     }
 }
 
@@ -118,7 +144,7 @@ function startTimer(duration) {
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
             alert('Time is up!');
-            window.location.href = '/leaderboard.html'; 
+            window.location.href = '/leaderboard.html'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
         }
 
         timeRemaining--;
@@ -133,14 +159,13 @@ document.addEventListener('DOMContentLoaded', async() => {
 
     await loadImages();  // Load images for the first round
     
-    document.getElementById('real-image').src = realImageUrl;
-    document.getElementById('ai-image').src = aiImageUrl;
+    refreshImages(); // Refresh the images to display them on the page
 
-    document.getElementById('real-image').addEventListener('click', function() {
+    document.getElementById('game-image1').addEventListener('click', function() {
         selectImage(this);
     });
 
-    document.getElementById('ai-image').addEventListener('click', function() {
+    document.getElementById('game-image2').addEventListener('click', function() {
         selectImage(this);
     });
 
