@@ -177,7 +177,9 @@ app.get("/api/image/:type", async (req, res) => {
   res.json({ url: random.url });
 });
 
-
+app.get("/admin", (req, res) => {
+  res.render("admin");
+});
 
 // Logout
 app.get("/logout", (req, res) => {
