@@ -47,6 +47,16 @@ app.use(
   })
 );
 
+// Middleware- added for a responsive navbar
+app.use((req, res, next) => {
+  // Make user session data available in all templates
+  res.locals.user = req.session.authenticated ? {
+    username: req.session.username,
+    authenticated: true
+  } : null;
+  next();
+});
+
 // Routes
 
 // Home Page
