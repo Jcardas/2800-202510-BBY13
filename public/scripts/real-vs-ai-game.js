@@ -29,9 +29,6 @@ async function fetchImage(type) {
 async function loadImages() {
     realImageUrl = await fetchImage('real');
     aiImageUrl = await fetchImage('ai');
-  
-    console.log("Real Image:", realImageUrl);
-    console.log("AI Image:", aiImageUrl);
 }
 
 
