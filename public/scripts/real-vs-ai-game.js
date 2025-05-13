@@ -72,9 +72,6 @@ async function refreshImages() {
     // Preload the next round's images
     await preloadNextImages();
 
-    console.log('Real Image URL:', realImageUrl);
-    console.log('AI Image URL:', aiImageUrl);
-
     // Randomly assign images to game-image1 and game-image2
     const randomIndex = Math.floor(Math.random() * 2);
     const gameImage1 = document.getElementById('game-image1');
@@ -94,8 +91,6 @@ async function refreshImages() {
         // Use preloaded images for the next round
     realImageUrl = nextRealImageUrl;
     aiImageUrl = nextAiImageUrl;
-
-    console.log('here!');
 }
 
 
