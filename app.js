@@ -276,6 +276,43 @@ app.get("/api/joke", async (req, res) => {
   }
 });
 
+// Information Hub Routes
+app.get("/information", async (req, res) => {
+  try {
+      // Get all information pages for listing
+      const pages = await database.db(MONGODB_DATABASE)
+          .collection("information")
+          .find({}, { projection: { title: 1, slug: 1, description: 1 } })
+          .toArray();
+
+      res.render("information-list", { 
+          title: 'Information Hub',
+          pages 
+      });
+  } catch (error) {
+      console.error("Error fetching information pages:", error);
+      res.status(500).render("500");
+  }
+});
+
+// Dynamic Information Page
+app.get("/information/:slug", async (req, res) => {
+  try {
+      const slug = req.params.slug;
+      
+      const content = await database.db(MONGODB_DATABASE)
+          .collection("information")
+          .findOne({ slug });
+
+      res.render("information", { 
+          title: content?.title || 'Information',
+          content 
+      });
+  } catch (error) {
+      console.error("Error fetching information page:", error);
+      res.status(500).render("500");
+  }
+});
 
 // Admin Page
 // Only accessible to authenticated users with admin role
