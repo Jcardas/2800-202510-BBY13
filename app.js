@@ -73,6 +73,12 @@ app.get("/home", (req, res) => {
   });
 });
 
+app.get("/games", (req, res) => {
+  res.render("games", {
+    title: 'Games'
+  });
+});
+
 app.get("/signup", (req, res) => {
   res.render("signup", {
     title: 'Sign Up'
