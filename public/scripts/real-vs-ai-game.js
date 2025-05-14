@@ -1,5 +1,4 @@
-// TODO: Upload the images to the page and create a function to load them
-// Keep track of score after each round
+// TODO: Keep track of score after each round
 
 // Function to provide hints (For now, hints will be linked to the round)
 const totalRounds = 10;
@@ -21,8 +20,8 @@ let realImage = null;
 let selectedImage = null;
 let progressBarFull;
 
-
-
+// This will be used to calculate time taken to complete the game
+let gameStartTime = null;
 
 // stores images that have already been used
 let usedImages = [];
@@ -88,7 +87,7 @@ async function refreshImages() {
 
         realImage = 'game-image2'; // Set the real image to game-image2
     }
-        // Use preloaded images for the next round
+    // Use preloaded images for the next round
     realImageUrl = nextRealImageUrl;
     aiImageUrl = nextAiImageUrl;
 }
@@ -169,6 +168,13 @@ function closePopup() {
 }
 
 // Function to go to the next round
+/**
+ * Advances the game to the next round or ends the game if all rounds are completed.
+ * - If there are remaining rounds, it updates the progress bar, refreshes the images, 
+ *   and closes the popup.
+ * - If all rounds are completed, it calculates the total time taken, submits the 
+ *   player's score to the server, and redirects to the leaderboard page.
+ */
 function nextRound() {
     currentRound++;
     if (currentRound < totalRounds) {
@@ -176,7 +182,28 @@ function nextRound() {
         refreshImages();
         closePopup(); // Close the popup after the user clicks next
     } else {
-        window.location.href = '/leaderboard'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
+        const timeTakenInSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+
+        const scoreData = {
+            score: score,
+            total: totalRounds,
+            timeTaken: timeTakenInSeconds
+        };
+
+        fetch("/api/score", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(scoreData)
+        })
+            .then(res => res.text())
+            .then(msg => {
+                console.log("Score submitted:", msg);
+                window.location.href = "/leaderboard";
+            })
+            .catch(err => {
+                console.error("Error submitting score:", err);
+                window.location.href = "/leaderboard"; // fallback
+            });
     }
 }
 
@@ -207,6 +234,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     progressBarFull = document.getElementById('progress-bar-full');
     const tenMinutes = 10 * 60; // 10 minutes 
     startTimer(tenMinutes);
+
+    // Start the game timer
+    gameStartTime = Date.now();
 
     // Preload the first set of images
     await loadImages();
