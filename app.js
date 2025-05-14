@@ -138,13 +138,6 @@ app.get("/login", (req, res) => {
 }
 );
 
-app.get("/real-vs-ai", (req, res) => {
-  res.render("real-vs-ai", {
-    title: 'Real vs AI'
-  });
-}
-);
-
 app.get("/real-vs-ai-game", (req, res) => {
   res.render("real-vs-ai-game", {
     title: 'Real vs AI Game'
