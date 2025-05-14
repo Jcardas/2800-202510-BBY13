@@ -5,14 +5,18 @@
 const totalRounds = 10;
 let currentRound = 0;
 
-let nextRealImageUrl = '';
-let nextAiImageUrl = '';
+let nextRealImageObj = '';
+let nextAiImageObj = '';
 
 let score = 0; // Initialize score variable
 
 // Where we will store the image URLs each round
-let realImageUrl = '';
-let aiImageUrl = '';
+let realImageObj = '';
+let aiImageObj = '';
+
+let leftImage = null;
+let rightImage = null;
+
 
 // This will be updated to be either game-image1 or game-image2
 // depending on which one is the real image 
@@ -32,6 +36,7 @@ const IMAGES_SIZE = 20;
 
 
 // Function to load images from the database and display them on the page
+// Returns an object: { url, description }
 async function fetchImage(type) {
     const response = await fetch(`/api/image/${type}`);
     const data = await response.json();
@@ -41,7 +46,7 @@ async function fetchImage(type) {
         // If the image is already used, fetch a new one, if there are no more images, return a placeholder image
         if (usedImages.length >= IMAGES_SIZE) {
             console.log('Image databank exhausted, using placeholder image.');
-            return '/placeholder.png'; // Placeholder image URL
+            return { url: '/placeholder.png', description: 'No description available.' }; // Placeholder
         }
         console.log(`Image already used: trying again...`);
         // Recursively call fetchImage to get a new image
@@ -49,20 +54,21 @@ async function fetchImage(type) {
     }
     // Add the image URL to the used images array
     usedImages.push(data.url);
-    return data.url;
+    return { url: data.url, description: data.description };
 }
 
 // Function to set the image URLs for the game
 // This function will be called when the game starts and after each round
 async function loadImages() {
-    realImageUrl = await fetchImage('real');
-    aiImageUrl = await fetchImage('ai');
+
+    realImageObj = await fetchImage('real');
+    aiImageObj = await fetchImage('ai');
 }
 
 // Function to preload the next 2 images
 async function preloadNextImages() {
-    nextRealImageUrl = await fetchImage('real');
-    nextAiImageUrl = await fetchImage('ai');
+    nextRealImageObj = await fetchImage('real');
+    nextAiImageObj = await fetchImage('ai');
 }
 
 // Function to refresh the images (game-image1 and game-image2) 
@@ -78,19 +84,22 @@ async function refreshImages() {
     const gameImage2 = document.getElementById('game-image2');
 
     if (randomIndex === 0) {
-        gameImage1.src = realImageUrl;
-        gameImage2.src = aiImageUrl;
+        gameImage1.src = realImageObj.url;
+        gameImage2.src = aiImageObj.url;
 
         realImage = 'game-image1'; // Set the real image to game-image1
+
+        leftImage = realImageObj;
+        rightImage = aiImageObj;
     } else {
-        gameImage1.src = aiImageUrl;
-        gameImage2.src = realImageUrl;
+        gameImage1.src = aiImageObj.url;
+        gameImage2.src = realImageObj.url;
 
         realImage = 'game-image2'; // Set the real image to game-image2
+
+        leftImage = aiImageObj;
+        rightImage = realImageObj;
     }
-        // Use preloaded images for the next round
-    realImageUrl = nextRealImageUrl;
-    aiImageUrl = nextAiImageUrl;
 }
 
 
@@ -151,21 +160,73 @@ async function submitAnswer() {
 
 // Function to change the text of the round popup based on if the user is correct or not
 function roundAlert(isReal) {
-
-    // un hidden the popup
-    const popup = document.getElementById('popup');
+    // Unhide the popup
+    const popup = document.getElementById('round-popup');
     popup.classList.remove('hidden');
 
-    const popupTitle = document.getElementById('popup-title');
+    const popupTitle = document.getElementById('round-popup-title');
     popupTitle.innerText = isReal ? 'Correct!' : 'Wrong!';
 
-    const popupMessage = document.getElementById('popup-message');
+    const popupMessage = document.getElementById('round-popup-message');
     popupMessage.innerText = isReal ? 'You selected the real image!' : 'That was the AI-generated image.';
+
+    // Animate popup: fade in and scale up
+    popup.style.opacity = 0;
+    popup.style.transform = 'scale(0.95)';
+    requestAnimationFrame(() => {
+        popup.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        popup.style.opacity = 1;
+        popup.style.transform = 'scale(1)';
+    });
 }
 
-function closePopup() {
-    const popup = document.getElementById('popup');
-    popup.classList.add('hidden');
+function closeRoundPopup() {
+    const popup = document.getElementById('round-popup');
+    // Animate popup: fade out and scale down
+    popup.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    popup.style.opacity = 0;
+    popup.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        popup.classList.add('hidden');
+        // Reset styles for next open
+        popup.style.transition = '';
+        popup.style.opacity = '';
+        popup.style.transform = '';
+    }, 250);
+}
+
+// Function to show the hint popup with animation
+function showHintPopup() {
+
+    // get the hints from the server, ensuring the image on the left is always the first image passed to the function
+    getHints(leftImage.description, rightImage.description);
+
+    const hintPopup = document.getElementById('hint-popup');
+    hintPopup.classList.remove('hidden');
+    hintPopup.style.opacity = 0;
+    hintPopup.style.transform = 'scale(0.95)';
+    // Animate opacity and scale
+    requestAnimationFrame(() => {
+        hintPopup.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        hintPopup.style.opacity = 1;
+        hintPopup.style.transform = 'scale(1)';
+    });
+}
+
+// Function to close the hint popup with animation
+function closeHintPopup() {
+    const hintPopup = document.getElementById('hint-popup');
+    // Animate opacity and scale down
+    hintPopup.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    hintPopup.style.opacity = 0;
+    hintPopup.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        hintPopup.classList.add('hidden');
+        // Reset styles for next open
+        hintPopup.style.transition = '';
+        hintPopup.style.opacity = '';
+        hintPopup.style.transform = '';
+    }, 250);
 }
 
 // Function to go to the next round
@@ -173,8 +234,13 @@ function nextRound() {
     currentRound++;
     if (currentRound < totalRounds) {
         updateProgressBar();
+
+        // Use preloaded images for the next round
+        realImageObj = nextRealImageObj;
+        aiImageObj = nextAiImageObj;
+
         refreshImages();
-        closePopup(); // Close the popup after the user clicks next
+        closeRoundPopup(); // Close the popup after the user clicks next
     } else {
         window.location.href = '/leaderboard.html'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
     }
@@ -225,5 +291,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('next-button').addEventListener('click', nextRound);
 
+    document.getElementById('hint-button').addEventListener('click', showHintPopup);
+
+    document.getElementById('close-hint-button').addEventListener('click', closeHintPopup);
+
     progressBarFull.style.width = '0%';
 });
+
+// Sctript to have AI generate a hint based on the images description
+// This function will be called when the user clicks the hint button
+// Cache for hints per round
+let roundHintsCache = {};
+
+// Returns a unique key for the current round's images
+function getHintCacheKey(img1, img2) {
+    return `${currentRound}:${img1}|${img2}`;
+}
+
+async function getHints(image1, image2) {
+    const hintPopupMessage = document.getElementById("hint-popup-message");
+    const cacheKey = getHintCacheKey(image1, image2);
+
+    // If hints for this round are already cached, show them
+    if (roundHintsCache[cacheKey]) {
+        hintPopupMessage.innerText = roundHintsCache[cacheKey];
+        return;
+    }
+
+    // Show loading icon
+    hintPopupMessage.innerHTML = '<img src="/img/loading.svg" alt="Loading..." style="display:block;margin:auto;">';
+
+    let combinedHints = '';
+    if (image1 === image2) {
+        // Only fetch one hint if descriptions are the same
+        const res = await fetch(`/api/hint/${image1}`);
+        const data = await res.json();
+        combinedHints = data.hint;
+    } else {
+        // Fetch both hints if descriptions are different
+        const res1 = await fetch(`/api/hint/${image1}`);
+        const data1 = await res1.json();
+        const hint1 = data1.hint;
+
+        const res2 = await fetch(`/api/hint/${image2}`);
+        const data2 = await res2.json();
+        const hint2 = data2.hint;
+
+        combinedHints = `${hint1}\n\n${hint2}`;
+    }
+
+    roundHintsCache[cacheKey] = combinedHints;
+    hintPopupMessage.innerText = combinedHints;
+}

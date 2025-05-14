@@ -233,7 +233,9 @@ app.get("/api/image/:type", fromGamePage, async (req, res) => {
   if (!images.length) return res.status(404).send("No images found");
 
   const random = images[Math.floor(Math.random() * images.length)];
-  res.json({ url: random.url });
+
+  // Send the image URL and description as JSON, and the description tag will be used to generate a hint
+  res.json({ url: random.url, description: random.description });
 });
 
 //Creating scammer joke with ChatGPT API
@@ -243,7 +245,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-
+// Endpoint to get a joke
 app.get("/api/joke", async (req, res) => {
   try {
     const completion = await openai.chat.completions.create({
@@ -270,85 +272,123 @@ app.get("/api/joke", async (req, res) => {
 });
 
 
+// Endpoint to get a hint related to the description tag of the image pulled from database
+app.get("/api/hint/:description", async (req, res) => {
+  // Set a timeout promise that rejects after 10 seconds
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("timeout")), 10000)
+  );
+
+  try {
+    const completion = await Promise.race([
+      openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: "You are an assistant that generates quick. short and subtle hints to assist in spotting real and ai generated fake images. Do not provide any headings titles, or bold text, simply respond with the hint itself.",
+          },
+          {
+            role: "user",
+            content: `Provide a hint relating to spotting an ai generated ${req.params.description} image.`,
+          },
+        ],
+        temperature: 0.9,
+      }),
+      timeoutPromise,
+    ]);
+
+    const hint = completion.choices[0].message.content;
+    res.json({ hint });
+  } catch (error) {
+    if (error.message === "timeout") {
+      res.json({ hint: "Failed to get a hint in time, sorry" });
+    } else {
+      console.error("Error generating hint:", error);
+      res.status(500).json({ error: "Server Error: Failed to get hint." });
+    }
+  }
+});
+
 // Admin Page
 // Only accessible to authenticated users with admin role
 // This page will be used to add new images to the database
 app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
-  const message = req.session.message;
-  delete req.session.message;
+    const message = req.session.message;
+    delete req.session.message;
 
-  res.render('admin', { message });
-});
+    res.render('admin', { message });
+  });
 
-// Admin Image Upload
-app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
-  try {
-    if (!req.file) {
-      req.session.message = 'No image file uploaded.';
-      return res.redirect('/admin');
-    }
-
-    const type = req.body.type.toLowerCase();
-    const schema = Joi.object({
-      type: Joi.string().valid('ai', 'real').required()
-    });
-    const { error } = schema.validate({ type });
-    if (error) {
-      req.session.message = 'Invalid type: must be "ai" or "real"';
-      return res.redirect('/admin');
-    }
-
-    const image_uuid = uuid();
-    const base64Image = req.file.buffer.toString('base64');
-
-    const result = await cloudinary.uploader.upload(
-      `data:${req.file.mimetype};base64,${base64Image}`,
-      {
-        public_id: image_uuid,
-        folder: 'ai-vs-real-images'
+  // Admin Image Upload
+  app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) {
+        req.session.message = 'No image file uploaded.';
+        return res.redirect('/admin');
       }
-    );
 
-    if (!result?.secure_url) {
-      req.session.message = 'Cloudinary upload failed';
+      const type = req.body.type.toLowerCase();
+      const schema = Joi.object({
+        type: Joi.string().valid('ai', 'real').required()
+      });
+      const { error } = schema.validate({ type });
+      if (error) {
+        req.session.message = 'Invalid type: must be "ai" or "real"';
+        return res.redirect('/admin');
+      }
+
+      const image_uuid = uuid();
+      const base64Image = req.file.buffer.toString('base64');
+
+      const result = await cloudinary.uploader.upload(
+        `data:${req.file.mimetype};base64,${base64Image}`,
+        {
+          public_id: image_uuid,
+          folder: 'ai-vs-real-images'
+        }
+      );
+
+      if (!result?.secure_url) {
+        req.session.message = 'Cloudinary upload failed';
+        return res.redirect('/admin');
+      }
+
+      await imageCollection.insertOne({
+        url: result.secure_url,
+        type: type
+      });
+
+      req.session.message = 'Image successfully uploaded!';
       return res.redirect('/admin');
+
+    } catch (err) {
+      console.error(err);
+      req.session.message = 'Error uploading image';
+      res.redirect('/admin');
     }
-
-    await imageCollection.insertOne({
-      url: result.secure_url,
-      type: type
-    });
-
-    req.session.message = 'Image successfully uploaded!';
-    return res.redirect('/admin');
-
-  } catch (err) {
-    console.error(err);
-    req.session.message = 'Error uploading image';
-    res.redirect('/admin');
-  }
-});
+  });
 
 
-// Logout
-app.get("/logout", (req, res) => {
-  req.session.destroy();
-  res.redirect("/");
-});
+  // Logout
+  app.get("/logout", (req, res) => {
+    req.session.destroy();
+    res.redirect("/");
+  });
 
-app.use(express.static(__dirname + "/public"));
+  app.use(express.static(__dirname + "/public"));
 
-// 404 Fallback
-app.get("/*dummy", (req, res) => {
-  res.status(404);
-  res.render("404", {
-    title: 'Page not found'
-  })
-});
+  // 404 Fallback
+  app.get("/*dummy", (req, res) => {
+    res.status(404);
+    res.render("404", {
+      title: 'Page not found'
+    })
+  });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+  // Start server
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
 
 
