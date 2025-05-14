@@ -23,6 +23,20 @@ const MONGODB_DATABASE = process.env.MONGODB_DATABASE;
 
 const NODE_SESSION_SECRET = process.env.NODE_SESSION_SECRET;
 
+// Cloudinary .env values
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_CLOUD_KEY,
+  api_secret: process.env.CLOUDINARY_CLOUD_SECRET
+});
+
+// Variables needed for image upload
+const multer = require('multer');
+const { v4: uuid } = require('uuid');
+const upload = multer({ storage: multer.memoryStorage() });
+
 // MongoDB client
 var { database } = require("./databaseConnection");
 const userCollection = database.db(MONGODB_DATABASE).collection("users");
@@ -47,6 +61,38 @@ app.use(
   })
 );
 
+// Middleware functions
+
+// Middleware to check if user is authenticated (logged in)
+function isAuthenticated(req, res, next) {
+  if (req.session.authenticated) {
+    return next();
+  } else {
+    res.redirect("/login");
+  }
+}
+
+// Middleware to check if the logged in user is an admin
+function isAdmin(req, res, next) {
+  if (req.session.role === "admin") {
+    return next();
+  } else {
+    return res.status(403).render("404");
+  }
+}
+
+// Middleware to check if the request is coming from the game page
+function fromGamePage(req, res, next) {
+  const referer = req.get("referer") || "";
+
+  if (referer.includes("/real-vs-ai-game")) {
+    return next(); // Allow access if request came from the game
+  }
+
+  // if not coming from game page, then this page does not exist
+  return res.status(404).render("404");
+}
+
 // Middleware- added for a responsive navbar
 app.use((req, res, next) => {
   // Make user session data available in all templates
@@ -70,6 +116,12 @@ app.get("/", (req, res) => {
 app.get("/home", (req, res) => {
   res.render("home", {
     title: 'Home'
+  });
+});
+
+app.get("/games", (req, res) => {
+  res.render("games", {
+    title: 'Games'
   });
 });
 
@@ -146,10 +198,11 @@ app.post("/signup", async (req, res) => {
   }
 
   const hashed = await bcrypt.hash(password, saltRounds);
-  await userCollection.insertOne({ username, email, password: hashed });
+  await userCollection.insertOne({ username, email, password: hashed, role: "user" });
 
   req.session.authenticated = true;
   req.session.username = username;
+  req.session.role = "user";
 
   res.redirect("/");
 });
@@ -181,17 +234,20 @@ app.post("/login", async (req, res) => {
 
   req.session.authenticated = true;
   req.session.username = user.username;
+  req.session.role = user.role;
 
   res.redirect("/");
 });
 
 // routes to get image urls from the database
-// might need to add middleware to check if user is authenticated to access this route (currently anyone can access it and see image urls)
-app.get("/api/image/:type", async (req, res) => {
+// if rout is accessed from the game page (real-vs-ai-game.js), then it will return a random image url
+// if not, then it will return a 404 error
+// this is to prevent direct access to the image urls
+app.get("/api/image/:type", fromGamePage, async (req, res) => {
   const type = req.params.type;
 
   if (type !== "real" && type !== "ai") {
-    return res.status(404).sendFile(__dirname + "/404");
+    return res.status(404).render("404");
   }
 
   const images = await imageCollection.find({ type }).toArray();
@@ -201,6 +257,98 @@ app.get("/api/image/:type", async (req, res) => {
   res.json({ url: random.url });
 });
 
+//Creating scammer joke with ChatGPT API
+const OpenAI = require("openai");
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+
+app.get("/api/joke", async (req, res) => {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: "You are a witty assistant who tells short jokes about online scammers.",
+        },
+        {
+          role: "user",
+          content: "Tell me a joke about scammers.",
+        },
+      ],
+      temperature: 0.9,
+    });
+
+    const joke = completion.choices[0].message.content;
+    res.json({ joke });
+  } catch (error) {
+    console.error("Error generating joke:", error);
+    res.status(500).json({ error: "Failed to get joke" });
+  }
+});
+
+
+// Admin Page
+// Only accessible to authenticated users with admin role
+// This page will be used to add new images to the database
+app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
+  const message = req.session.message;
+  delete req.session.message;
+
+  res.render('admin', { message });
+});
+
+// Admin Image Upload
+app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      req.session.message = 'No image file uploaded.';
+      return res.redirect('/admin');
+    }
+
+    const type = req.body.type.toLowerCase();
+    const schema = Joi.object({
+      type: Joi.string().valid('ai', 'real').required()
+    });
+    const { error } = schema.validate({ type });
+    if (error) {
+      req.session.message = 'Invalid type: must be "ai" or "real"';
+      return res.redirect('/admin');
+    }
+
+    const image_uuid = uuid();
+    const base64Image = req.file.buffer.toString('base64');
+
+    const result = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${base64Image}`,
+      {
+        public_id: image_uuid,
+        folder: 'ai-vs-real-images'
+      }
+    );
+
+    if (!result?.secure_url) {
+      req.session.message = 'Cloudinary upload failed';
+      return res.redirect('/admin');
+    }
+
+    await imageCollection.insertOne({
+      url: result.secure_url,
+      type: type
+    });
+
+    req.session.message = 'Image successfully uploaded!';
+    return res.redirect('/admin');
+
+  } catch (err) {
+    console.error(err);
+    req.session.message = 'Error uploading image';
+    res.redirect('/admin');
+  }
+});
 
 
 // Logout
@@ -223,3 +371,5 @@ app.get("/*dummy", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+
