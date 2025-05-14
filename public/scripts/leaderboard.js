@@ -6,8 +6,12 @@ function closePopup() {
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const popup = document.getElementById('popup');
-    popup.classList.remove('hidden');
+    if(window.isLoggedIn) 
+        {
+            return;
+        }
+        const popup = document.getElementById('popup');
+        popup.classList.remove('hidden');
 
     const popupTitle = document.getElementById('popup-title');
     popupTitle.innerText = 'Sign up to play!';
