@@ -1,0 +1,51 @@
+<%- include("partials/header") %>
+  <!-- Navbar -->
+  <%- include("partials/navbar") %>
+
+    <!-- Accessibility Sliding Bar -->
+    <%- include("partials/sliding_bar") %>
+
+    <script src="/scripts/leaderboard.js"></script>
+
+    <main class="container mx-auto mt-8 flex-grow">
+        <!-- Page Title -->
+        <div class="flex justify-between items-center">
+            <h1 class="text-lime-400 text-4xl font-bold text-left ml-4">
+                Leaderboard
+            </h1>
+            <a href="/signup" class="bg-gradient-to-r from-lime-400 to-lime-300 text-white text-2xl font-bold py-4 px-12 rounded shadow hover:shadow-lg transition-shadow mr-8">
+                Sign Up
+            </a>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div class="mt-6 mx-auto max-w-screen-md mb-8">
+          <div class="bg-white rounded-2xl shadow-lg p-4 space-y-2">
+            <% leaderboard.forEach((entry, index) => {
+                let bg = "";
+                if(index === 0) {
+                    bg = "bg-yellow-200";
+                }
+                else if(index === 1) {
+                    bg = "bg-gray-200";
+                }
+                else if(index === 2) {
+                    bg = "bg-orange-200";
+                }
+            %>
+            <div class="flex justify-between px-4 py-3 rounded-xl shadow-sm <%= bg %>">
+                <div class="flex items-center space-x-4">
+                    <div class="text-xl font-bold"><%= index + 1 %></div>
+                    <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+                    <div class="text-lg font-semibold"><%= entry.name %></div>
+                </div>
+                <div class="text-lg font-medium text-right mt-2">
+                    <%= entry.score %>/<%= entry.total %> | <%= entry.time %>
+                </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <%- include("partials/footer") %>

@@ -176,7 +176,7 @@ function nextRound() {
         refreshImages();
         closePopup(); // Close the popup after the user clicks next
     } else {
-        window.location.href = '/leaderboard.html'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
+        window.location.href = '/leaderboard'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
     }
 }
 
