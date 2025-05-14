@@ -77,7 +77,9 @@ function isAdmin(req, res, next) {
   if (req.session.role === "admin") {
     return next();
   } else {
-    return res.status(403).render("404");
+    return res.status(403).render("404", {
+      title: 'Cannot access this page'
+    })
   }
 }
 
@@ -90,7 +92,9 @@ function fromGamePage(req, res, next) {
   }
 
   // if not coming from game page, then this page does not exist
-  return res.status(404).render("404");
+  return res.status(404).render("404", {
+    title: 'Page not found'
+  });
 }
 
 // Middleware- added for a responsive navbar
@@ -161,11 +165,11 @@ app.get("/leaderboard", (req, res) => {
     { name: 'Diana', score: 7, total: 10, time: '05:00' },
     { name: 'Eve', score: 6, total: 10, time: '06:30' }
   ];
-  res.render('leaderboard', { 
+  res.render('leaderboard', {
     leaderboard,
     title: 'Leaderboard',
     isLoggedIn: req.session.authenticated
-   });
+  });
 });
 
 // Signup Form Submission
@@ -242,11 +246,17 @@ app.get("/api/image/:type", fromGamePage, async (req, res) => {
   const type = req.params.type;
 
   if (type !== "real" && type !== "ai") {
-    return res.status(404).render("404");
+    return res.status(404).render("404", {
+      title: 'Page not found'
+    });
   }
 
   const images = await imageCollection.find({ type }).toArray();
-  if (!images.length) return res.status(404).send("No images found");
+  if (!images.length) {
+    return res.status(404).render("404", {
+      title: 'No images found'
+    });
+  }
 
   const random = images[Math.floor(Math.random() * images.length)];
   res.json({ url: random.url });
@@ -293,7 +303,10 @@ app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
   const message = req.session.message;
   delete req.session.message;
 
-  res.render('admin', { message });
+  res.render('admin', {
+    title: 'Admin Dashboard',
+    message
+  });
 });
 
 // Admin Image Upload
