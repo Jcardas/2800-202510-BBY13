@@ -168,8 +168,10 @@ app.get("/leaderboard", (req, res) => {
     { name: 'Diana', score: 7, total: 10, time: '05:00' },
     { name: 'Eve', score: 6, total: 10, time: '06:30' }
   ];
-  res.render('leaderboard', { leaderboard,
-    title: 'Leaderboard'
+  res.render('leaderboard', { 
+    leaderboard,
+    title: 'Leaderboard',
+    isLoggedIn: req.session.authenticated
    });
 });
 

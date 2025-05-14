@@ -8,18 +8,18 @@
     <!-- Alert Popup -->
      <%- include("partials/games/real-vs-ai-popup") %>
 
+     <script>
+        window.isLoggedIn = <%= isLoggedIn ? 'true' : 'false' %>;
+     </script>
     <script src="/scripts/leaderboard.js"></script>
     <script src="/scripts/real-vs-ai-game.js"></script>
-    
+
     <main class="container mx-auto mt-8 flex-grow">
         <!-- Page Title -->
         <div class="flex justify-between items-center">
             <h1 class="text-lime-400 text-4xl font-bold text-left ml-4">
                 Leaderboard
             </h1>
-            <a href="/signup" class="bg-gradient-to-r from-lime-400 to-lime-300 text-white text-2xl font-bold py-4 px-12 rounded shadow hover:shadow-lg transition-shadow mr-8">
-                Sign Up
-            </a>
         </div>
 
         <!-- Leaderboard Table -->
