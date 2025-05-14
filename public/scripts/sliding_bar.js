@@ -1,5 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // Apply saved font size on load
+    const savedSize = sessionStorage.getItem("fontSize");
+    if (savedSize) {
+        document.documentElement.style.fontSize = `${savedSize}px`;
+        console.log(`Loaded saved font size: ${savedSize}px`);
+    }
+
+
     console.log("Sliding Bar script loaded.");
+    const increaseFontIcon = document.getElementById("increaseFontIcon");
 
     const toggleIcon = document.getElementById('toggleIcon');
     const toggleIconPath = document.getElementById('toggleIconPath');
@@ -21,4 +31,29 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error("Required elements not found in the DOM.");
     }
+
+    if (increaseFontIcon) {
+    increaseFontIcon.addEventListener("click", () => {
+      const root = document.documentElement;
+      const currentSize = parseFloat(getComputedStyle(root).fontSize); 
+      const newSize = Math.min(currentSize * 1.1, 24); // cap at 24px
+      root.style.fontSize = `${newSize}px`;
+      sessionStorage.setItem("fontSize", newSize); // Save to session
+
+      console.log(`Font size increased to ${newSize}px`);
+    });
+    }
+
+    const resetFontIcon = document.getElementById("resetFontIcon");
+
+    if (resetFontIcon) {
+    resetFontIcon.addEventListener("click", () => {
+        document.documentElement.style.fontSize = "16px";
+        sessionStorage.removeItem("fontSize");
+        console.log("Font size reset to default (16px)");
+    });
+    }
+
+
+
 });
