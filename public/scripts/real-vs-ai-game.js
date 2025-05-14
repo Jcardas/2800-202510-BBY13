@@ -151,21 +151,69 @@ async function submitAnswer() {
 
 // Function to change the text of the round popup based on if the user is correct or not
 function roundAlert(isReal) {
-
-    // un hidden the popup
-    const popup = document.getElementById('popup');
+    // Unhide the popup
+    const popup = document.getElementById('round-popup');
     popup.classList.remove('hidden');
 
-    const popupTitle = document.getElementById('popup-title');
+    const popupTitle = document.getElementById('round-popup-title');
     popupTitle.innerText = isReal ? 'Correct!' : 'Wrong!';
 
-    const popupMessage = document.getElementById('popup-message');
+    const popupMessage = document.getElementById('round-popup-message');
     popupMessage.innerText = isReal ? 'You selected the real image!' : 'That was the AI-generated image.';
+
+    // Animate popup: fade in and scale up
+    popup.style.opacity = 0;
+    popup.style.transform = 'scale(0.95)';
+    requestAnimationFrame(() => {
+        popup.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        popup.style.opacity = 1;
+        popup.style.transform = 'scale(1)';
+    });
 }
 
-function closePopup() {
-    const popup = document.getElementById('popup');
-    popup.classList.add('hidden');
+function closeRoundPopup() {
+    const popup = document.getElementById('round-popup');
+    // Animate popup: fade out and scale down
+    popup.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    popup.style.opacity = 0;
+    popup.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        popup.classList.add('hidden');
+        // Reset styles for next open
+        popup.style.transition = '';
+        popup.style.opacity = '';
+        popup.style.transform = '';
+    }, 250);
+}
+
+// Function to show the hint popup with animation
+function showHintPopup() {
+    const hintPopup = document.getElementById('hint-popup');
+    hintPopup.classList.remove('hidden');
+    hintPopup.style.opacity = 0;
+    hintPopup.style.transform = 'scale(0.95)';
+    // Animate opacity and scale
+    requestAnimationFrame(() => {
+        hintPopup.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        hintPopup.style.opacity = 1;
+        hintPopup.style.transform = 'scale(1)';
+    });
+}
+
+// Function to close the hint popup with animation
+function closeHintPopup() {
+    const hintPopup = document.getElementById('hint-popup');
+    // Animate opacity and scale down
+    hintPopup.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    hintPopup.style.opacity = 0;
+    hintPopup.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        hintPopup.classList.add('hidden');
+        // Reset styles for next open
+        hintPopup.style.transition = '';
+        hintPopup.style.opacity = '';
+        hintPopup.style.transform = '';
+    }, 250);
 }
 
 // Function to go to the next round
@@ -174,7 +222,7 @@ function nextRound() {
     if (currentRound < totalRounds) {
         updateProgressBar();
         refreshImages();
-        closePopup(); // Close the popup after the user clicks next
+        closeRoundPopup(); // Close the popup after the user clicks next
     } else {
         window.location.href = '/leaderboard.html'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
     }
@@ -224,6 +272,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('submit-answer').addEventListener('click', submitAnswer);
 
     document.getElementById('next-button').addEventListener('click', nextRound);
+
+    document.getElementById('hint-button').addEventListener('click', showHintPopup);
+
+    document.getElementById('close-hint-button').addEventListener('click', closeHintPopup);
 
     progressBarFull.style.width = '0%';
 });
