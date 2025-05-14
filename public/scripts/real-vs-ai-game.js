@@ -195,7 +195,7 @@ function startTimer(duration) {
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
             alert('Time is up!');
-            window.location.href = '/leaderboard.html'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
+            window.location.href = '/leaderboard'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
         }
 
         timeRemaining--;
