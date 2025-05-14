@@ -1,17 +1,58 @@
 <%- include("partials/header") %>
     <!-- Navbar -->
     <%- include("partials/navbar") %>
-    <%- include("partials/location_alert") %>
+        <%- include("partials/location_alert") %>
 
-    <!-- Accessibility Sliding Bar -->
-    <%- include("partials/sliding_bar") %>
+            <!-- Accessibility Sliding Bar -->
+            <%- include("partials/sliding_bar") %>
 
-    <main class="container mx-auto mt-8 flex-grow ">
-        <h1 class="text-black text-4xl font-bold text-left mb-12 ml-2">Admin</h1>
-        <p class="text-xl text-center p-4">Admin page</p>
-        <p class="text-xl text-center p-4">This page is only accessible to admins.</p>
-        <p class="text-xl text-center p-4">You can upload a new image for the ai vs. real image game.</p>
-    </main>
+                <main class="container mx-auto mt-8 flex-grow ">
+                    <h1 class="text-black text-4xl font-bold text-left mb-12 ml-2">Admin</h1>
+                    <p class="text-xl text-center p-4">This page is only accessible to admins.</p>
+                    <p class="text-xl text-center p-4">You can upload a new image for the ai vs. real image game.</p>
+                    <form action="/admin/upload" method="POST" enctype="multipart/form-data"
+                        class="flex flex-col items-center">
+                        <!-- File input -->
+                        <input id="imageInput" type="file" name="image" accept="image/*" class="mb-4" required />
 
-    <!-- Footer -->
-<%- include("partials/footer") %>
+                        <!-- Preview Image -->
+                        <img id="previewImage" src="#" alt="Image Preview"
+                            class="hidden mb-4 rounded shadow-md max-w-xs border" />
+
+                        <!-- Dropdown for type -->
+                        <select name="type" class="mb-4 p-2 border border-gray-300 rounded" required>
+                            <option value="">Select image type</option>
+                            <option value="AI">AI</option>
+                            <option value="Real">Real</option>
+                        </select>
+
+                        <!-- Submit button -->
+                        <button type="submit" class="bg-blue-500 text-white mb-4 px-4 py-2 rounded">Upload</button>
+                    </form>
+
+                </main>
+
+                <script>
+                    const imageInput = document.getElementById("imageInput");
+                    const previewImage = document.getElementById("previewImage");
+
+                    imageInput.addEventListener("change", function () {
+                        const file = this.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+
+                            reader.onload = function (e) {
+                                previewImage.src = e.target.result;
+                                previewImage.classList.remove("hidden");
+                            };
+
+                            reader.readAsDataURL(file);
+                        } else {
+                            previewImage.src = "#";
+                            previewImage.classList.add("hidden");
+                        }
+                    });
+                </script>
+
+                <!-- Footer -->
+                <%- include("partials/footer") %>

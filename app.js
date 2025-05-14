@@ -196,7 +196,9 @@ app.post("/login", async (req, res) => {
 });
 
 // routes to get image urls from the database
-// might need to add middleware to check if user is authenticated to access this route (currently anyone can access it and see image urls)
+// if rout is accessed from the game page (real-vs-ai-game.js), then it will return a random image url
+// if not, then it will return a 404 error
+// this is to prevent direct access to the image urls
 app.get("/api/image/:type", fromGamePage, async (req, res) => {
   const type = req.params.type;
 
@@ -211,6 +213,9 @@ app.get("/api/image/:type", fromGamePage, async (req, res) => {
   res.json({ url: random.url });
 });
 
+// Admin Page
+// Only accessible to authenticated users with admin role
+// This page will be used to add new images to the database
 app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
   res.render("admin");
 });
