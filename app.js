@@ -193,6 +193,40 @@ app.get("/api/image/:type", async (req, res) => {
   res.json({ url: random.url });
 });
 
+//Creating scammer joke with ChatGPT API
+const OpenAI = require("openai");
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+
+app.get("/api/joke", async (req, res) => {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: "You are a witty assistant who tells short jokes about online scammers.",
+        },
+        {
+          role: "user",
+          content: "Tell me a joke about scammers.",
+        },
+      ],
+      temperature: 0.8,
+    });
+
+    const joke = completion.choices[0].message.content;
+    res.json({ joke });
+  } catch (error) {
+    console.error("Error generating joke:", error);
+    res.status(500).json({ error: "Failed to get joke" });
+  }
+});
+
+
 
 
 // Logout
@@ -215,3 +249,5 @@ app.get("/*dummy", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+

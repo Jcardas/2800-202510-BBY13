@@ -6,71 +6,90 @@
             <!-- Accessibility Sliding Bar -->
             <%- include("partials/sliding_bar") %>
 
-                <main class="container mx-auto mt-8 flex-grow">
-                    <!-- Page Title -->
-                    <h1 class="text-black text-4xl font-bold text-left ml-2">Home</h1>
-                    <div class="container mx-auto px-6 flex relative py-8">
-                        <div class="sm:w-2/3 lg:w-2/5 flex flex-col relative z-20">
-                            <h2 class="text-xl font-bold mb-4">About
-                            </h2>
-                            <p class=" sm:text-base text-black">
-                                Welcome to IsThisMyGrandson.com, a platform where you can play games that challenge your
-                                perception and understanding of AI-generated content. Our games are designed to be fun,
-                                engaging, and educational, helping you to navigate the world of AI with confidence.
-                            </p>
+            <main class="container mx-auto mt-8 flex-grow">
+                <!-- Page Title -->
+                <h1 class="text-black text-4xl font-bold text-left ml-2">Home</h1>
+                <div class="container mx-auto px-6 flex relative py-8">
+                    <div class="sm:w-2/3 lg:w-2/5 flex flex-col relative z-20">
+                        <h2 class="text-xl font-bold mb-4">About
+                        </h2>
+                        <p class=" sm:text-base text-black">
+                            Welcome to IsThisMyGrandson.com, a platform where you can play games that challenge your
+                            perception and understanding of AI-generated content. Our games are designed to be fun,
+                            engaging, and educational, helping you to navigate the world of AI with confidence.
+                        </p>
 
-                            <div class="flex mt-8 mb-12">
-                                <a href="/games"
-                                    class="bg-gradient-to-r 
-                                    from-lime-400 to-lime-300 text-white 
-                                    text-xl font-bold py-2 px-4 
-                                    rounded 
-                                    shadow 
-                                    hover:shadow-lg 
-                                    hover:from-lime-500 hover:to-lime-400
-                                    transition-shadow">
-                                    Games
-                                </a>
-                            </div>
-
-                            <h2 class="text-xl font-bold mb-4">Leaderboard
-                            </h2>
-                            <p class=" sm:text-base text-black">
-                                Sign up to see how you rank against other players. Compete for the top spot and earn bragging rights
-                                among your friends and family!
-                            </p>
-
-                            <div class="flex mt-8 gap-4">
-                                <a href="/signup"
-                                    class="bg-gradient-to-r 
-                                    from-blue-400 to-blue-300 text-white 
-                                    text-xl font-bold py-2 px-4 
-                                    rounded 
-                                    shadow 
-                                    hover:shadow-lg 
-                                    hover:from-blue-500 hover:to-blue-400
-                                    transition-shadow">
-                                    Sign Up
-                                </a>
-                                <a href="/login"
-                                    class="bg-gray-400 text-white 
-                                    text-xl font-bold py-2 px-4 
-                                    rounded 
-                                    shadow 
-                                    hover:shadow-lg 
-                                    hover:bg-gray-500
-                                    transition-shadow">Log
-                                    In</a>
-                                </a>
-                            </div>
-
+                        <div class="flex mt-8 mb-12">
+                            <a href="/games"
+                                class="bg-gradient-to-r 
+                                from-lime-400 to-lime-300 text-white 
+                                text-xl font-bold py-2 px-4 
+                                rounded 
+                                shadow 
+                                hover:shadow-lg 
+                                hover:from-lime-500 hover:to-lime-400
+                                transition-shadow">
+                                Games
+                            </a>
                         </div>
-                        <div class="hidden sm:block sm:w-1/3 lg:w-3/5 relative">
-                            <img src="/img/unhappy-gma.png" class="max-w-xs md:max-w-sm m-auto" />
+
+                        <h2 class="text-xl font-bold mb-4">Leaderboard
+                        </h2>
+                        <p class=" sm:text-base text-black">
+                            Sign up to see how you rank against other players. Compete for the top spot and earn bragging rights
+                            among your friends and family!
+                        </p>
+
+                        <div class="flex mt-8 gap-4">
+                            <a href="/signup"
+                                class="bg-gradient-to-r 
+                                from-blue-400 to-blue-300 text-white 
+                                text-xl font-bold py-2 px-4 
+                                rounded 
+                                shadow 
+                                hover:shadow-lg 
+                                hover:from-blue-500 hover:to-blue-400
+                                transition-shadow">
+                                Sign Up
+                            </a>
+                            <a href="/login"
+                                class="bg-gray-400 text-white 
+                                text-xl font-bold py-2 px-4 
+                                rounded 
+                                shadow 
+                                hover:shadow-lg 
+                                hover:bg-gray-500
+                                transition-shadow">Log
+                                In</a>
+                            </a>
                         </div>
+
+                        <h2 class="text-xl font-bold mt-12 mb-4">More fun
+                        </h2>
+                        <p id="joke-output" class="joke-output sm:text-base text-black ">
+                            Click the button to get an AI-generated scam joke!
+                        </p>
+
+                        <div class="flex flex-col items-center mt-2 gap-2">
+                            <div class="joke-section">
+                                <button onclick="getScamJoke()" class="bg-yellow-400 text-white 
+                                text-xl font-bold py-2 px-4 
+                                rounded 
+                                shadow 
+                                hover:shadow-lg 
+                                hover:bg-yellow-500
+                                transition-shadow flex items-center justify-center">
+                                    <img src="/icons/stars.svg" alt="ai_button">
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
-                </main>
-                </main>
+                    <div class="hidden sm:block sm:w-1/3 lg:w-3/5 relative">
+                        <img src="/img/unhappy-gma.png" class="max-w-xs md:max-w-sm m-auto" />
+                    </div>
+                </div>
 
-                <!-- Footer -->
-                <%- include("partials/footer") %>
+    </main>
+    <!-- Footer -->
+    <%- include("partials/footer") %>
