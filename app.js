@@ -265,7 +265,7 @@ app.get("/api/joke", async (req, res) => {
           content: "Tell me a joke about scammers.",
         },
       ],
-      temperature: 0.8,
+      temperature: 0.9,
     });
 
     const joke = completion.choices[0].message.content;
