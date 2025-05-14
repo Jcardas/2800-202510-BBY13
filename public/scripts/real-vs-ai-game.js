@@ -1,5 +1,4 @@
-// TODO: Upload the images to the page and create a function to load them
-// Keep track of score after each round
+// TODO: Keep track of score after each round
 
 // Function to provide hints (For now, hints will be linked to the round)
 const totalRounds = 10;
@@ -25,8 +24,8 @@ let realImage = null;
 let selectedImage = null;
 let progressBarFull;
 
-
-
+// This will be used to calculate time taken to complete the game
+let gameStartTime = null;
 
 // stores images that have already been used
 let usedImages = [];
@@ -230,6 +229,13 @@ function closeHintPopup() {
 }
 
 // Function to go to the next round
+/**
+ * Advances the game to the next round or ends the game if all rounds are completed.
+ * - If there are remaining rounds, it updates the progress bar, refreshes the images, 
+ *   and closes the popup.
+ * - If all rounds are completed, it calculates the total time taken, submits the 
+ *   player's score to the server, and redirects to the leaderboard page.
+ */
 function nextRound() {
     currentRound++;
     if (currentRound < totalRounds) {
@@ -242,26 +248,69 @@ function nextRound() {
         refreshImages();
         closeRoundPopup(); // Close the popup after the user clicks next
     } else {
-        window.location.href = '/leaderboard.html'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
+        // stop the timer when the game is over
+        clearInterval(timerInterval);
+
+        const timeTakenInSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+
+        const scoreData = {
+            score: score,
+            total: totalRounds,
+            timeTaken: timeTakenInSeconds
+        };
+
+        console.log("Game over! Your scored : " + score + " out of " + totalRounds + " in " + timeTakenInSeconds + " seconds.");
+
+        if (window.isLoggedIn) {
+            console.log("User is logged in. Attempting to send score:", scoreData);
+            fetch("/api/score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(scoreData)
+            })
+                .then(res => res.text())
+                .then(msg => {
+                    console.log("Server response:", msg);
+                    window.location.href = "/leaderboard"; // Only redirect after score saved
+                })
+                .catch(err => {
+                    console.error("Error submitting score:", err);
+                    window.location.href = "/leaderboard"; // Fallback redirect
+                });
+        } else {
+            // If not logged in, still redirect after showing message
+            console.log("User not logged in, score not saved.");
+            window.location.href = "/leaderboard";
+        }
     }
 }
+
+let timerInterval;
 
 // Starts the timer based on the duration provided
 function startTimer(duration) {
     const timerElement = document.getElementById('timer');
     let timeRemaining = duration;
 
-    const timerInterval = setInterval(() => {
+    timerInterval = setInterval(() => {
         const minutes = Math.floor(timeRemaining / 60);
         const seconds = timeRemaining % 60;
 
-        // Update timer display
-        timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        // Check if the timer element exists (prevents errors if user navigated away)
+        if (timerElement) {
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
 
+        // Stop the timer and redirect only once
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
-            alert('Time is up!');
-            window.location.href = '/leaderboard.html'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
+
+            // Add a slight delay before redirect to avoid race conditions
+            setTimeout(() => {
+                window.location.href = '/leaderboard';
+            }, 100);
+
+            return; // Exit early
         }
 
         timeRemaining--;
@@ -273,6 +322,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     progressBarFull = document.getElementById('progress-bar-full');
     const tenMinutes = 10 * 60; // 10 minutes 
     startTimer(tenMinutes);
+
+    // Start the game timer
+    gameStartTime = Date.now();
 
     // Preload the first set of images
     await loadImages();

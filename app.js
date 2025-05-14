@@ -41,9 +41,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 var { database } = require("./databaseConnection");
 const userCollection = database.db(MONGODB_DATABASE).collection("users");
 const imageCollection = database.db(MONGODB_DATABASE).collection("images");
+const scoresCollection = database.db(MONGODB_DATABASE).collection("scores");
+
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Session setup
 const mongoStore = MongoStore.create({
@@ -77,7 +80,9 @@ function isAdmin(req, res, next) {
   if (req.session.role === "admin") {
     return next();
   } else {
-    return res.status(403).render("404");
+    return res.status(403).render("404", {
+      title: 'Cannot access this page'
+    })
   }
 }
 
@@ -90,7 +95,9 @@ function fromGamePage(req, res, next) {
   }
 
   // if not coming from game page, then this page does not exist
-  return res.status(404).render("404");
+  return res.status(404).render("404", {
+    title: 'Page not found'
+  });
 }
 
 // Middleware- added for a responsive navbar
@@ -140,7 +147,8 @@ app.get("/login", (req, res) => {
 
 app.get("/real-vs-ai-game", (req, res) => {
   res.render("real-vs-ai-game", {
-    title: 'Real vs AI Game'
+    title: 'Real vs AI Game',
+    isLoggedIn: req.session.authenticated || false
   });
 }
 );
@@ -151,6 +159,22 @@ app.get("/about", (req, res) => {
   });
 }
 );
+
+app.get("/leaderboard", (req, res) => {
+  // Sample data to simulate a leaderboard
+  const leaderboard = [
+    { name: 'Alice', score: 10, total: 10, time: '02:15' },
+    { name: 'Bob', score: 9, total: 10, time: '03:10' },
+    { name: 'Charlie', score: 8, total: 10, time: '04:05' },
+    { name: 'Diana', score: 7, total: 10, time: '05:00' },
+    { name: 'Eve', score: 6, total: 10, time: '06:30' }
+  ];
+  res.render('leaderboard', {
+    leaderboard,
+    title: 'Leaderboard',
+    isLoggedIn: req.session.authenticated === true
+  });
+});
 
 // Signup Form Submission
 app.post("/signup", async (req, res) => {
@@ -181,6 +205,7 @@ app.post("/signup", async (req, res) => {
 
   req.session.authenticated = true;
   req.session.username = username;
+  req.session.email = email;
   req.session.role = "user";
 
   res.redirect("/");
@@ -213,6 +238,7 @@ app.post("/login", async (req, res) => {
 
   req.session.authenticated = true;
   req.session.username = user.username;
+  req.session.email = user.email;
   req.session.role = user.role;
 
   res.redirect("/");
@@ -226,11 +252,17 @@ app.get("/api/image/:type", fromGamePage, async (req, res) => {
   const type = req.params.type;
 
   if (type !== "real" && type !== "ai") {
-    return res.status(404).render("404");
+    return res.status(404).render("404", {
+      title: 'Page not found'
+    });
   }
 
   const images = await imageCollection.find({ type }).toArray();
-  if (!images.length) return res.status(404).send("No images found");
+  if (!images.length) {
+    return res.status(404).render("404", {
+      title: 'No images found'
+    });
+  }
 
   const random = images[Math.floor(Math.random() * images.length)];
 
@@ -317,8 +349,11 @@ app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
     const message = req.session.message;
     delete req.session.message;
 
-    res.render('admin', { message });
+  res.render('admin', {
+    title: 'Admin Dashboard',
+    message
   });
+});
 
   // Admin Image Upload
   app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
@@ -368,6 +403,35 @@ app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
       res.redirect('/admin');
     }
   });
+
+// Submit Score if user is authenticated
+app.post("/api/score", isAuthenticated, async (req, res) => {
+  try {
+    const { score, total, timeTaken } = req.body;
+
+    await scoresCollection.insertOne({
+      email: req.session.email,
+      username: req.session.username,
+      score,
+      total,
+      time: timeTaken,
+      timestamp: new Date()
+    });
+
+    console.log("Score saved successfully:", {
+      email: req.session.email,
+      username: req.session.username,
+      score,
+      total,
+      time: timeTaken
+    });
+
+    res.send("Score saved successfully.");
+  } catch (error) {
+    console.error("Error saving score:", error);
+    res.status(500).send("Failed to save score.");
+  }
+});
 
 
   // Logout
