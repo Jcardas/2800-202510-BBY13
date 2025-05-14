@@ -23,6 +23,20 @@ const MONGODB_DATABASE = process.env.MONGODB_DATABASE;
 
 const NODE_SESSION_SECRET = process.env.NODE_SESSION_SECRET;
 
+// Cloudinary .env values
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_CLOUD_KEY,
+  api_secret: process.env.CLOUDINARY_CLOUD_SECRET
+});
+
+// Variables needed for image upload
+const multer = require('multer');
+const { v4: uuid } = require('uuid');
+const upload = multer({ storage: multer.memoryStorage() });
+
 // MongoDB client
 var { database } = require("./databaseConnection");
 const userCollection = database.db(MONGODB_DATABASE).collection("users");
@@ -217,8 +231,61 @@ app.get("/api/image/:type", fromGamePage, async (req, res) => {
 // Only accessible to authenticated users with admin role
 // This page will be used to add new images to the database
 app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
-  res.render("admin");
+  const message = req.session.message;
+  delete req.session.message;
+
+  res.render('admin', { message });
 });
+
+// Admin Image Upload
+app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      req.session.message = 'No image file uploaded.';
+      return res.redirect('/admin');
+    }
+
+    const type = req.body.type.toLowerCase();
+    const schema = Joi.object({
+      type: Joi.string().valid('ai', 'real').required()
+    });
+    const { error } = schema.validate({ type });
+    if (error) {
+      req.session.message = 'Invalid type: must be "ai" or "real"';
+      return res.redirect('/admin');
+    }
+
+    const image_uuid = uuid();
+    const base64Image = req.file.buffer.toString('base64');
+
+    const result = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${base64Image}`,
+      {
+        public_id: image_uuid,
+        folder: 'ai-vs-real-images'
+      }
+    );
+
+    if (!result?.secure_url) {
+      req.session.message = 'Cloudinary upload failed';
+      return res.redirect('/admin');
+    }
+
+    await imageCollection.insertOne({
+      url: result.secure_url,
+      type: type
+    });
+
+    req.session.message = 'Image successfully uploaded!';
+    return res.redirect('/admin');
+
+  } catch (err) {
+    console.error(err);
+    req.session.message = 'Error uploading image';
+    res.redirect('/admin');
+  }
+});
+
 
 // Logout
 app.get("/logout", (req, res) => {

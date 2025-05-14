@@ -8,27 +8,54 @@
 
                 <main class="container mx-auto mt-8 flex-grow ">
                     <h1 class="text-black text-4xl font-bold text-left mb-12 ml-2">Admin</h1>
-                    <p class="text-xl text-center p-4">This page is only accessible to admins.</p>
-                    <p class="text-xl text-center p-4">You can upload a new image for the ai vs. real image game.</p>
-                    <form action="/admin/upload" method="POST" enctype="multipart/form-data"
-                        class="flex flex-col items-center">
-                        <!-- File input -->
-                        <input id="imageInput" type="file" name="image" accept="image/*" class="mb-4" required />
+                    <% if (message) { %>
+                        <div id="toast-message" class="flex items-center p-4 mb-4 rounded-lg shadow 
+                            text-sm font-medium 
+                            <%= message.includes('success') 
+                            ? 'bg-green-100 text-green-800 border border-green-300' 
+                            : 'bg-red-100 text-red-800 border border-red-300' %>">
 
-                        <!-- Preview Image -->
-                        <img id="previewImage" src="#" alt="Image Preview"
-                            class="hidden mb-4 rounded shadow-md max-w-xs border" />
+                            <span class="flex-grow">
+                                <%= message %>
+                            </span>
 
-                        <!-- Dropdown for type -->
-                        <select name="type" class="mb-4 p-2 border border-gray-300 rounded" required>
-                            <option value="">Select image type</option>
-                            <option value="AI">AI</option>
-                            <option value="Real">Real</option>
-                        </select>
+                            <button onclick="document.getElementById('toast-message').remove()"
+                                class="ms-3 text-lg leading-none">×</button>
+                        </div>
 
-                        <!-- Submit button -->
-                        <button type="submit" class="bg-blue-500 text-white mb-4 px-4 py-2 rounded">Upload</button>
-                    </form>
+                        <script>
+                            setTimeout(() => {
+                                const toast = document.getElementById('toast-message');
+                                if (toast) toast.remove();
+                            }, 4000); // 4000ms = 4 seconds
+                        </script>
+                        <% } %>
+
+                            <p class="text-xl text-center p-4">This page is only accessible to admins.</p>
+                            <p class="text-xl text-center p-4">You can upload a new image for the ai vs. real image
+                                game.</p>
+
+                            <form action="/admin/upload" method="POST" enctype="multipart/form-data"
+                                class="flex flex-col items-center">
+                                <!-- File input -->
+                                <input id="imageInput" type="file" name="image" accept="image/*" class="mb-4"
+                                    required />
+
+                                <!-- Preview Image -->
+                                <img id="previewImage" src="#" alt="Image Preview"
+                                    class="hidden mb-4 rounded shadow-md max-w-xs border" />
+
+                                <!-- Dropdown for type -->
+                                <select name="type" class="mb-4 p-2 border border-gray-300 rounded" required>
+                                    <option value="">Select image type</option>
+                                    <option value="AI">AI</option>
+                                    <option value="Real">Real</option>
+                                </select>
+
+                                <!-- Submit button -->
+                                <button type="submit"
+                                    class="bg-blue-500 text-white mb-4 px-4 py-2 rounded">Upload</button>
+                            </form>
 
                 </main>
 
