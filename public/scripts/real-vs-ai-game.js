@@ -5,14 +5,18 @@
 const totalRounds = 10;
 let currentRound = 0;
 
-let nextRealImageUrl = '';
-let nextAiImageUrl = '';
+let nextRealImageObj = '';
+let nextAiImageObj = '';
 
 let score = 0; // Initialize score variable
 
 // Where we will store the image URLs each round
-let realImageUrl = '';
-let aiImageUrl = '';
+let realImageObj = '';
+let aiImageObj = '';
+
+let leftImage = null;
+let rightImage = null;
+
 
 // This will be updated to be either game-image1 or game-image2
 // depending on which one is the real image 
@@ -32,6 +36,7 @@ const IMAGES_SIZE = 20;
 
 
 // Function to load images from the database and display them on the page
+// Returns an object: { url, description }
 async function fetchImage(type) {
     const response = await fetch(`/api/image/${type}`);
     const data = await response.json();
@@ -41,7 +46,7 @@ async function fetchImage(type) {
         // If the image is already used, fetch a new one, if there are no more images, return a placeholder image
         if (usedImages.length >= IMAGES_SIZE) {
             console.log('Image databank exhausted, using placeholder image.');
-            return '/placeholder.png'; // Placeholder image URL
+            return { url: '/placeholder.png', description: 'No description available.' }; // Placeholder
         }
         console.log(`Image already used: trying again...`);
         // Recursively call fetchImage to get a new image
@@ -49,20 +54,21 @@ async function fetchImage(type) {
     }
     // Add the image URL to the used images array
     usedImages.push(data.url);
-    return data.url;
+    return { url: data.url, description: data.description };
 }
 
 // Function to set the image URLs for the game
 // This function will be called when the game starts and after each round
 async function loadImages() {
-    realImageUrl = await fetchImage('real');
-    aiImageUrl = await fetchImage('ai');
+
+    realImageObj = await fetchImage('real');
+    aiImageObj = await fetchImage('ai');
 }
 
 // Function to preload the next 2 images
 async function preloadNextImages() {
-    nextRealImageUrl = await fetchImage('real');
-    nextAiImageUrl = await fetchImage('ai');
+    nextRealImageObj = await fetchImage('real');
+    nextAiImageObj = await fetchImage('ai');
 }
 
 // Function to refresh the images (game-image1 and game-image2) 
@@ -78,19 +84,22 @@ async function refreshImages() {
     const gameImage2 = document.getElementById('game-image2');
 
     if (randomIndex === 0) {
-        gameImage1.src = realImageUrl;
-        gameImage2.src = aiImageUrl;
+        gameImage1.src = realImageObj.url;
+        gameImage2.src = aiImageObj.url;
 
         realImage = 'game-image1'; // Set the real image to game-image1
+
+        leftImage = realImageObj;
+        rightImage = aiImageObj;
     } else {
-        gameImage1.src = aiImageUrl;
-        gameImage2.src = realImageUrl;
+        gameImage1.src = aiImageObj.url;
+        gameImage2.src = realImageObj.url;
 
         realImage = 'game-image2'; // Set the real image to game-image2
+
+        leftImage = aiImageObj;
+        rightImage = realImageObj;
     }
-        // Use preloaded images for the next round
-    realImageUrl = nextRealImageUrl;
-    aiImageUrl = nextAiImageUrl;
 }
 
 
@@ -188,6 +197,10 @@ function closeRoundPopup() {
 
 // Function to show the hint popup with animation
 function showHintPopup() {
+
+    // get the hints from the server, ensuring the image on the left is always the first image passed to the function
+    getHints(leftImage.description, rightImage.description);
+
     const hintPopup = document.getElementById('hint-popup');
     hintPopup.classList.remove('hidden');
     hintPopup.style.opacity = 0;
@@ -221,6 +234,11 @@ function nextRound() {
     currentRound++;
     if (currentRound < totalRounds) {
         updateProgressBar();
+
+        // Use preloaded images for the next round
+        realImageObj = nextRealImageObj;
+        aiImageObj = nextAiImageObj;
+
         refreshImages();
         closeRoundPopup(); // Close the popup after the user clicks next
     } else {
@@ -279,3 +297,49 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     progressBarFull.style.width = '0%';
 });
+
+// Sctript to have AI generate a hint based on the images description
+// This function will be called when the user clicks the hint button
+// Cache for hints per round
+let roundHintsCache = {};
+
+// Returns a unique key for the current round's images
+function getHintCacheKey(img1, img2) {
+    return `${currentRound}:${img1}|${img2}`;
+}
+
+async function getHints(image1, image2) {
+    const hintPopupMessage = document.getElementById("hint-popup-message");
+    const cacheKey = getHintCacheKey(image1, image2);
+
+    // If hints for this round are already cached, show them
+    if (roundHintsCache[cacheKey]) {
+        hintPopupMessage.innerText = roundHintsCache[cacheKey];
+        return;
+    }
+
+    // Show loading icon
+    hintPopupMessage.innerHTML = '<img src="/img/loading.svg" alt="Loading..." style="display:block;margin:auto;">';
+
+    let combinedHints = '';
+    if (image1 === image2) {
+        // Only fetch one hint if descriptions are the same
+        const res = await fetch(`/api/hint/${image1}`);
+        const data = await res.json();
+        combinedHints = data.hint;
+    } else {
+        // Fetch both hints if descriptions are different
+        const res1 = await fetch(`/api/hint/${image1}`);
+        const data1 = await res1.json();
+        const hint1 = data1.hint;
+
+        const res2 = await fetch(`/api/hint/${image2}`);
+        const data2 = await res2.json();
+        const hint2 = data2.hint;
+
+        combinedHints = `${hint1}\n\n${hint2}`;
+    }
+
+    roundHintsCache[cacheKey] = combinedHints;
+    hintPopupMessage.innerText = combinedHints;
+}
