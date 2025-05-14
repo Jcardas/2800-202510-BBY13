@@ -1,14 +1,21 @@
 {
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.6.1",
+    "cloudinary-jquery": "^2.13.1",
     "connect-mongo": "^5.1.0",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-mongo-sanitize": "^2.2.0",
     "express-session": "^1.18.1",
     "joi": "^17.13.3",
     "mongoose": "^8.14.1",
+    "multer": "^1.4.5-lts.2",
     "node": "^24.0.0",
+    "uuid": "^11.1.0",
+    "openai": "^4.98.0",
     "nodemon": "^3.1.10"
+
   }
 }
