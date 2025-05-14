@@ -41,9 +41,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 var { database } = require("./databaseConnection");
 const userCollection = database.db(MONGODB_DATABASE).collection("users");
 const imageCollection = database.db(MONGODB_DATABASE).collection("images");
+const scoresCollection = database.db(MONGODB_DATABASE).collection("scores");
+
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Session setup
 const mongoStore = MongoStore.create({
@@ -144,7 +147,8 @@ app.get("/login", (req, res) => {
 
 app.get("/real-vs-ai-game", (req, res) => {
   res.render("real-vs-ai-game", {
-    title: 'Real vs AI Game'
+    title: 'Real vs AI Game',
+    isLoggedIn: req.session.authenticated || false
   });
 }
 );
@@ -168,7 +172,7 @@ app.get("/leaderboard", (req, res) => {
   res.render('leaderboard', {
     leaderboard,
     title: 'Leaderboard',
-    isLoggedIn: req.session.authenticated
+    isLoggedIn: req.session.authenticated === true
   });
 });
 
@@ -201,6 +205,7 @@ app.post("/signup", async (req, res) => {
 
   req.session.authenticated = true;
   req.session.username = username;
+  req.session.email = email;
   req.session.role = "user";
 
   res.redirect("/");
@@ -233,6 +238,7 @@ app.post("/login", async (req, res) => {
 
   req.session.authenticated = true;
   req.session.username = user.username;
+  req.session.email = user.email;
   req.session.role = user.role;
 
   res.redirect("/");
@@ -355,6 +361,35 @@ app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), asyn
     console.error(err);
     req.session.message = 'Error uploading image';
     res.redirect('/admin');
+  }
+});
+
+// Submit Score if user is authenticated
+app.post("/api/score", isAuthenticated, async (req, res) => {
+  try {
+    const { score, total, timeTaken } = req.body;
+
+    await scoresCollection.insertOne({
+      email: req.session.email,
+      username: req.session.username,
+      score,
+      total,
+      time: timeTaken,
+      timestamp: new Date()
+    });
+
+    console.log("Score saved successfully:", {
+      email: req.session.email,
+      username: req.session.username,
+      score,
+      total,
+      time: timeTaken
+    });
+
+    res.send("Score saved successfully.");
+  } catch (error) {
+    console.error("Error saving score:", error);
+    res.status(500).send("Failed to save score.");
   }
 });
 

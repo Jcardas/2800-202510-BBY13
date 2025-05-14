@@ -182,6 +182,9 @@ function nextRound() {
         refreshImages();
         closePopup(); // Close the popup after the user clicks next
     } else {
+        // stop the timer when the game is over
+        clearInterval(timerInterval);
+
         const timeTakenInSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
 
         const scoreData = {
@@ -190,39 +193,58 @@ function nextRound() {
             timeTaken: timeTakenInSeconds
         };
 
-        fetch("/api/score", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(scoreData)
-        })
-            .then(res => res.text())
-            .then(msg => {
-                console.log("Score submitted:", msg);
-                window.location.href = "/leaderboard";
+        console.log("Game over! Your scored : " + score + " out of " + totalRounds + " in " + timeTakenInSeconds + " seconds.");
+
+        if (window.isLoggedIn) {
+            console.log("User is logged in. Attempting to send score:", scoreData);
+            fetch("/api/score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(scoreData)
             })
-            .catch(err => {
-                console.error("Error submitting score:", err);
-                window.location.href = "/leaderboard"; // fallback
-            });
+                .then(res => res.text())
+                .then(msg => {
+                    console.log("Server response:", msg);
+                    window.location.href = "/leaderboard"; // Only redirect after score saved
+                })
+                .catch(err => {
+                    console.error("Error submitting score:", err);
+                    window.location.href = "/leaderboard"; // Fallback redirect
+                });
+        } else {
+            // If not logged in, still redirect after showing message
+            console.log("User not logged in, score not saved.");
+            window.location.href = "/leaderboard";
+        }
     }
 }
+
+let timerInterval;
 
 // Starts the timer based on the duration provided
 function startTimer(duration) {
     const timerElement = document.getElementById('timer');
     let timeRemaining = duration;
 
-    const timerInterval = setInterval(() => {
+    timerInterval = setInterval(() => {
         const minutes = Math.floor(timeRemaining / 60);
         const seconds = timeRemaining % 60;
 
-        // Update timer display
-        timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        // Check if the timer element exists (prevents errors if user navigated away)
+        if (timerElement) {
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
 
+        // Stop the timer and redirect only once
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
-            alert('Time is up!');
-            window.location.href = '/leaderboard'; //TODO Use a route to redirect to the leaderboard instead, remove alert.
+
+            // Add a slight delay before redirect to avoid race conditions
+            setTimeout(() => {
+                window.location.href = '/leaderboard';
+            }, 100);
+
+            return; // Exit early
         }
 
         timeRemaining--;
