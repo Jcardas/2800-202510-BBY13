@@ -134,31 +134,39 @@ app.get("/games", (req, res) => {
 
 app.get("/signup", (req, res) => {
   res.render("signup", {
-    title: 'Sign Up'
+    title: 'Sign Up',
+    errorMessage: req.session.errorMessage || null,
+    email: req.session.email || null
   });
-}
-);
+  // Clear the error message after displaying it
+  req.session.errorMessage = null;
+  req.session.email = null;
+});
+
 app.get("/login", (req, res) => {
   res.render("login", {
-    title: 'Log In'
+    title: 'Log In',
+    errorMessage: req.session.errorMessage || null,
+    email: req.session.email || null
   });
-}
-);
+  // Clear the error message after displaying it
+  req.session.errorMessage = null;
+  req.session.email = null;
+});
+
 
 app.get("/real-vs-ai-game", (req, res) => {
   res.render("real-vs-ai-game", {
     title: 'Real vs AI Game',
     isLoggedIn: req.session.authenticated || false
   });
-}
-);
+});
 
 app.get("/about", (req, res) => {
   res.render("about", {
     title: 'About Us'
   });
-}
-);
+});
 
 app.get("/leaderboard", (req, res) => {
   // Sample data to simulate a leaderboard
@@ -182,6 +190,9 @@ app.post("/signup", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
+    // Store form data in session in case we need to redirect back
+    req.session.formData = { username, email };
+
   const schema = Joi.object({
     username: Joi.string().required(),
     email: Joi.string().email().required(),
@@ -190,14 +201,14 @@ app.post("/signup", async (req, res) => {
 
   const validation = schema.validate({ username, email, password });
   if (validation.error) {
-    return res.send("Invalid input. IMPLEMENT THIS PAGE");
+    req.session.errorMessage = "Invalid input. Please check your entries.";
+    return res.redirect("/signup");
   }
 
   const existingUser = await userCollection.findOne({ email });
   if (existingUser) {
-    return res.send(
-      "User already exists. IMPLEMENT THIS PAGE"
-    );
+    req.session.errorMessage = "User with this email already exists.";
+    return res.redirect("/signup");
   }
 
   const hashed = await bcrypt.hash(password, saltRounds);
@@ -223,19 +234,24 @@ app.post("/login", async (req, res) => {
 
   const validation = schema.validate({ email, password });
   if (validation.error) {
-    return res.send("Invalid input. IMPLEMENT THIS PAGE");
+    req.session.errorMessage = "Invalid input format";
+    req.session.email = email; // Preserve the email they entered
+    return res.redirect("/login");
   }
 
   const user = await userCollection.findOne({ email });
   if (!user) {
-    return res.send("User not found. IMPLEMENT THIS PAGE");
+    req.session.errorMessage = "User not found";
+    req.session.email = email; // Preserve the email they entered
+    return res.redirect("/login");
   }
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
-    return res.send("Incorrect password. IMPLEMENT THIS PAGE");
+    req.session.errorMessage = "Incorrect password";
+    req.session.email = email; // Preserve the email they entered
+    return res.redirect("/login");
   }
-
   req.session.authenticated = true;
   req.session.username = user.username;
   req.session.email = user.email;
