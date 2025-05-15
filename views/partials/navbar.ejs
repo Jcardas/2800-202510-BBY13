@@ -11,12 +11,13 @@
         <li><a href="/games" class="hover:text-gray-600 transition-colors duration-200 font-medium">Games</a></li>
         <li><a href="/about" class="hover:text-gray-600 transition-colors duration-200 font-medium">About</a></li>
         <div class="flex items-center space-x-4">
-          <% if (user) { %>
+            <% if (user) { %>
             <!-- Logged in state -->
             <a href="/account" class="flex items-center">
-              <span class="md:inline mr-2"><img src="/icons/account_circle_black.svg" alt="Account"
-                  class="w-8 h-8 hover:opacity-60 transition-opacity duration-200"></span>
-
+              <span class="md:inline mr-2">
+              <img src="<%= user.profileImageUrl %>" alt="Account"
+                class="w-8 h-8 rounded-full object-cover hover:opacity-60 transition-opacity duration-200">
+              </span>
             </a>
             <a href="/logout" class="hidden md:block bg-gray-400
                   text-white 
