@@ -193,6 +193,15 @@ app.get("/leaderboard", (req, res) => {
   });
 });
 
+app.get("/account", isAuthenticated, (req, res) => {
+  res.render("account", {
+    title: 'Account',
+    username: req.session.username,
+    email: req.session.email,
+    role: req.session.role
+  });
+});
+
 // Signup Form Submission
 app.post("/signup", async (req, res) => {
   const username = req.body.username;
