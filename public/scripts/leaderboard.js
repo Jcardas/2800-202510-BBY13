@@ -4,7 +4,8 @@ function closeLeaderboardPopup() {
     popup.classList.add('hidden');
 }
 
-
+//Checks if user is logged in
+// If not, show the leaderboard popup
 document.addEventListener('DOMContentLoaded', async () => {
     if(window.isLoggedIn) 
         {

@@ -177,20 +177,24 @@ app.get("/about", (req, res) => {
   });
 });
 
-app.get("/leaderboard", (req, res) => {
-  // Sample data to simulate a leaderboard
-  const leaderboard = [
-    { name: 'Alice', score: 10, total: 10, time: '02:15' },
-    { name: 'Bob', score: 9, total: 10, time: '03:10' },
-    { name: 'Charlie', score: 8, total: 10, time: '04:05' },
-    { name: 'Diana', score: 7, total: 10, time: '05:00' },
-    { name: 'Eve', score: 6, total: 10, time: '06:30' }
-  ];
-  res.render('leaderboard', {
+app.get("/leaderboard", async (req, res) => {
+  try {
+    // Fetch scores from the database
+    const leaderboard = await scoresCollection
+    .find({})
+    .sort({ score:-1, time: 1 }) 
+    .limit(6)
+    .toArray();
+
+    res.render('leaderboard', {
     leaderboard,
     title: 'Leaderboard',
     isLoggedIn: req.session.authenticated === true
   });
+  } catch (error) {
+    console.error("Error fetching leaderboard data:", error);
+    res.status(500).render("404", { title: 'Server Error' });
+  }
 });
 
 // Signup Form Submission
