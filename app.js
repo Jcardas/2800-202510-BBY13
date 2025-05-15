@@ -64,6 +64,14 @@ app.use(
   })
 );
 
+//Helper function to format leaderboard time as #:##
+function formatTime(seconds)
+{
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
 // Middleware functions
 
 // Middleware to check if user is authenticated (logged in)
@@ -301,6 +309,7 @@ app.get("/api/image/:type", fromGamePage, async (req, res) => {
 
 //Creating scammer joke with ChatGPT API
 const OpenAI = require("openai");
+const { time } = require("console");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -492,12 +501,15 @@ app.post("/api/score", isAuthenticated, async (req, res) => {
   try {
     const { score, total, timeTaken } = req.body;
 
+    //Format time
+    const formattedTime = formatTime(Number(timeTaken));
+
     await scoresCollection.insertOne({
       email: req.session.email,
       username: req.session.username,
       score,
       total,
-      time: timeTaken,
+      time: formattedTime,
       timestamp: new Date()
     });
 
@@ -506,7 +518,7 @@ app.post("/api/score", isAuthenticated, async (req, res) => {
       username: req.session.username,
       score,
       total,
-      time: timeTaken
+      time: formattedTime,
     });
 
     res.send("Score saved successfully.");
