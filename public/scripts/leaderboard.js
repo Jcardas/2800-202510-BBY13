@@ -1,5 +1,5 @@
 
-function closePopup() {
+function closeLeaderboardPopup() {
     const popup = document.getElementById('leaderboard-popup');
     popup.classList.add('hidden');
 }
@@ -19,5 +19,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     const popupMessage = document.getElementById('leaderboard-popup-message');
     popupMessage.innerText = 'Please sign up to save your score.';
 
-    document.getElementById('close-button').addEventListener('click', closePopup);
+    document.getElementById('close-button').addEventListener('click', closeLeaderboardPopup);
 });
