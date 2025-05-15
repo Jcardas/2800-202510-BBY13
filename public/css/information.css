@@ -1,0 +1,20 @@
+.required-field::after {
+    content: " *";
+    color: red;
+}
+#editor[data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: #9CA3AF;
+}
+.spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
