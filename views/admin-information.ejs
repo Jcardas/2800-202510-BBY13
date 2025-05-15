@@ -1,0 +1,165 @@
+<%- include("partials/header") %>
+<!-- Navbar -->
+<%- include("partials/navbar") %>
+
+<!-- Body -->
+<main class="container mx-auto mt-8 flex-grow px-4">
+    <h1 class="text-3xl font-bold mb-6">Manage Information Pages</h1>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Add New Page</h2>
+        
+        <form id="pageForm" action="/admin/information/add" method="POST" enctype="multipart/form-data">
+            <div class="grid gap-6 mb-6 md:grid-cols-2">
+                <div>
+                    <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Title*</label>
+                    <input type="text" id="title" name="title" required
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                </div>
+                <div>
+                    <label for="slug" class="block mb-2 text-sm font-medium text-gray-900">URL Slug*</label>
+                    <input type="text" id="slug" name="slug" required
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <p class="mt-1 text-sm text-gray-500">e.g., "how-to-play" (no spaces, lowercase)</p>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Short Description*</label>
+                <textarea id="description" name="description" rows="2" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Featured Image</label>
+                <div class="flex items-center space-x-4">
+                    <div id="imagePreview" class="hidden w-32 h-32 bg-gray-100 rounded-lg overflow-hidden">
+                        <img id="previewImg" class="w-full h-full object-cover" src="" alt="Preview">
+                    </div>
+                    <label for="imageUpload" class="cursor-pointer">
+                        <div class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
+                            <span class="text-sm font-medium">Choose Image</span>
+                            <input type="file" id="imageUpload" name="image" accept="image/*" class="hidden">
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label for="editor" class="block mb-2 text-sm font-medium text-gray-900">Content*</label>
+                <div id="editorToolbar" class="mb-2 border border-gray-300 rounded-t-lg bg-gray-100 p-2">
+                    <button type="button" data-command="bold" class="p-1 mx-1 rounded hover:bg-gray-200" title="Bold">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button type="button" data-command="italic" class="p-1 mx-1 rounded hover:bg-gray-200" title="Italic">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button type="button" data-command="insertUnorderedList" class="p-1 mx-1 rounded hover:bg-gray-200" title="Bullet List">
+                        <i class="fas fa-list-ul"></i>
+                    </button>
+                    <button type="button" data-command="insertOrderedList" class="p-1 mx-1 rounded hover:bg-gray-200" title="Numbered List">
+                        <i class="fas fa-list-ol"></i>
+                    </button>
+                    <button type="button" data-command="createLink" class="p-1 mx-1 rounded hover:bg-gray-200" title="Link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                    <button type="button" data-command="h2" class="p-1 mx-1 rounded hover:bg-gray-200" title="Heading 2">
+                        H2
+                    </button>
+                    <button type="button" data-command="h3" class="p-1 mx-1 rounded hover:bg-gray-200" title="Heading 3">
+                        H3
+                    </button>
+                </div>
+                <div id="editor" contenteditable="true" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-b-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 min-h-[200px]"></div>
+                <textarea id="body" name="body" class="hidden" required></textarea>
+            </div>
+            
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm transition">
+                Save Page
+            </button>
+        </form>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Existing Pages</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Title</th>
+                        <th scope="col" class="px-6 py-3">URL</th>
+                        <th scope="col" class="px-6 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (existingPages && existingPages.length > 0) { %>
+                        <% existingPages.forEach(page => { %>
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                <td class="px-6 py-4 font-medium text-gray-900"><%= page.title %></td>
+                                <td class="px-6 py-4">/information/<%= page.slug %></td>
+                                <td class="px-6 py-4 flex space-x-2">
+                                    <a href="/admin/information/edit/<%= page.slug %>" class="text-blue-600 hover:underline">Edit</a>
+                                    <form action="/admin/information/delete/<%= page.slug %>" method="POST" onsubmit="return confirm('Are you sure?')">
+                                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr class="bg-white border-b">
+                            <td colspan="3" class="px-6 py-4 text-center">No pages found</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<%- include("partials/footer") %>
+
+<script>
+    // Rich text editor functionality
+    document.querySelectorAll('#editorToolbar button').forEach(button => {
+        button.addEventListener('click', function() {
+            const command = this.getAttribute('data-command');
+            if (command === 'createLink') {
+                const url = prompt('Enter the URL:');
+                if (url) document.execCommand(command, false, url);
+            } else if (command === 'h2' || command === 'h3') {
+                document.execCommand('formatBlock', false, command);
+            } else {
+                document.execCommand(command, false, null);
+            }
+        });
+    });
+
+    // Update hidden textarea before form submission
+    document.getElementById('pageForm').addEventListener('submit', function() {
+        document.getElementById('body').value = document.getElementById('editor').innerHTML;
+    });
+
+    // Image preview
+    document.getElementById('imageUpload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('previewImg').src = event.target.result;
+                document.getElementById('imagePreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Auto-generate slug from title
+    document.getElementById('title').addEventListener('input', function() {
+        const slugInput = document.getElementById('slug');
+        if (!slugInput.value) {
+            slugInput.value = this.value.toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w-]+/g, '');
+        }
+    });
+</script>

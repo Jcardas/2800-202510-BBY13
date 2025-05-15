@@ -373,6 +373,84 @@ app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), asyn
   }
 });
 
+// Admin Information Pages Routes
+app.get("/admin/information", isAuthenticated, isAdmin, async (req, res) => {
+  try {
+      const existingPages = await database.db(MONGODB_DATABASE)
+          .collection("information")
+          .find({}, { projection: { title: 1, slug: 1 } })
+          .toArray();
+
+      res.render("admin-information", {
+          title: 'Manage Information Pages',
+          existingPages
+      });
+  } catch (error) {
+      console.error("Error fetching information pages:", error);
+      res.status(500).render("500");
+  }
+});
+
+app.post("/admin/information/add", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
+  try {
+      const { title, slug, description, body } = req.body;
+      
+      // Validation
+      const schema = Joi.object({
+          title: Joi.string().required(),
+          slug: Joi.string().required().pattern(/^[a-z0-9-]+$/),
+          description: Joi.string().required(),
+          body: Joi.string().required()
+      });
+
+      const { error } = schema.validate({ title, slug, description, body });
+      if (error) {
+          req.session.message = { type: 'error', text: error.details[0].message };
+          return res.redirect('/admin/information');
+      }
+
+      // Check if slug already exists
+      const existingPage = await database.db(MONGODB_DATABASE)
+          .collection("information")
+          .findOne({ slug });
+
+      if (existingPage) {
+          req.session.message = { type: 'error', text: 'Slug already exists' };
+          return res.redirect('/admin/information');
+      }
+
+      // Handle image upload if present
+      let imageUrl = '';
+      if (req.file) {
+          const result = await cloudinary.uploader.upload(
+              `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
+              { folder: 'information-pages' }
+          );
+          imageUrl = result.secure_url;
+      }
+
+      // Insert new page
+      await database.db(MONGODB_DATABASE)
+          .collection("information")
+          .insertOne({
+              title,
+              slug,
+              description,
+              body,
+              imageUrl,
+              createdAt: new Date(),
+              updatedAt: new Date()
+          });
+
+      req.session.message = { type: 'success', text: 'Page created successfully' };
+      res.redirect('/admin/information');
+  } catch (error) {
+      console.error("Error adding information page:", error);
+      req.session.message = { type: 'error', text: 'Failed to create page' };
+      res.redirect('/admin/information');
+  }
+});
+
 
 // Logout
 app.get("/logout", (req, res) => {
