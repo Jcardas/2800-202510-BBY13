@@ -167,7 +167,7 @@ function roundAlert(isReal) {
     popupTitle.innerText = isReal ? 'Correct!' : 'Wrong!';
 
     const popupMessage = document.getElementById('round-popup-message');
-    popupMessage.innerText = isReal ? 'You selected the real image!' : 'That was the AI-generated image.';
+    popupMessage.innerText = isReal ? 'You selected the real photo!' : 'That was the AI-generated photo.';
 
     // Animate popup: fade in and scale up
     popup.style.opacity = 0;

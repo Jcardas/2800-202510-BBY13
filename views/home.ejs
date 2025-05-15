@@ -44,35 +44,49 @@
                             </a>
                         </div>
 
-                        <h2 class="text-xl font-bold mb-4">Leaderboard
+                        <h2 class="text-xl font-bold mb-4">Leaderboards
                         </h2>
                         <p class=" sm:text-base text-black">
-                            Sign up to see how you rank against other players. Compete for the top spot and earn bragging rights
-                            among your friends and family!
+                            Sign up to see how you rank against other players. In each of our games, 
+                            compete for the top spot and earn bragging rights among your friends and family!
                         </p>
 
                         <div class="flex mt-8 gap-4">
-                            <a href="/signup"
-                                class="bg-gradient-to-r 
-                                from-blue-400 to-blue-300 text-white 
-                                text-xl font-bold py-2 px-4 
-                                rounded 
-                                shadow 
-                                hover:shadow-lg 
-                                hover:from-blue-500 hover:to-blue-400
-                                transition-shadow">
-                                Sign Up
-                            </a>
-                            <a href="/login"
-                                class="bg-gray-400 text-white 
-                                text-xl font-bold py-2 px-4 
-                                rounded 
-                                shadow 
-                                hover:shadow-lg 
-                                hover:bg-gray-500
-                                transition-shadow">Log
-                                In</a>
-                            </a>
+                            <% if (!user) { %>
+                                <a href="/signup"
+                                    class="bg-gradient-to-r 
+                                    from-blue-400 to-blue-300 text-white 
+                                    text-xl font-bold py-2 px-4 
+                                    rounded 
+                                    shadow 
+                                    hover:shadow-lg 
+                                    hover:from-blue-500 hover:to-blue-400
+                                    transition-shadow">
+                                    Sign Up
+                                </a>
+                                <a href="/login"
+                                    class="bg-gray-400 text-white 
+                                    text-xl font-bold py-2 px-4 
+                                    rounded 
+                                    shadow 
+                                    hover:shadow-lg 
+                                    hover:bg-gray-500
+                                    transition-shadow">
+                                    Log In
+                                </a>
+                            <% } else { %>
+                                <a href="/leaderboard"
+                                    class="bg-gradient-to-r 
+                                    from-green-400 to-green-300 text-white 
+                                    text-xl font-bold py-2 px-4 
+                                    rounded 
+                                    shadow 
+                                    hover:shadow-lg 
+                                    hover:from-green-500 hover:to-green-400
+                                    transition-shadow">
+                                    View Leaderboards
+                                </a>
+                            <% } %>
                         </div>
 
                         <h2 class="text-xl font-bold mt-12 mb-4">More fun
