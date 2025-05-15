@@ -4,19 +4,79 @@
         <!-- Accessibility Sliding Bar -->
         <%- include("partials/sliding_bar") %>
 
-            <main>
+            <main class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto">
+                    <!-- Page Header -->
+                    <div class="text-center mb-16">
+                        <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">About BBY-13</h1>
+                        <p class="mt-5 max-w-xl mx-auto text-xl text-gray-500">Meet the talented individuals behind our success</p>
+                    </div>
 
-                    Team Name: BBY-13
-                    Team Members:
-                    <ul>
-                        <li> Grace Jung </li>
-                        <li> Armaan Brar </li>
-                        <li> Justin Cardas </li>
-                        <li> Ted Ip </li>
-                        <li> Mohammad Sadeghi </li>
-                    </ul>
-                </main>
-            </body>
+                    <!-- Team Members Grid -->
+                    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                        <!-- Grace Jung -->
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                            <img class="w-full h-48 object-cover" src="/img/nerd.png" alt="Grace Jung">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900">Grace Jung</h3>
+                                <p class="text-indigo-600 font-medium">Most Average Programmer</p>
+                                <p class="mt-2 text-gray-600 italic">"Organization is key to our success."</p>
+                            </div>
+                        </div>
+
+                        <!-- Armaan Brar -->
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                            <img class="w-full h-48 object-cover" src="/img/armaan.png" alt="Armaan Brar">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900">Armaan Brar</h3>
+                                <p class="text-indigo-600 font-medium">Lead Developer</p>
+                                <p class="mt-2 text-gray-600 italic">"Clean code is my passion."</p>
+                            </div>
+                        </div>
+
+                        <!-- Justin Cardas -->
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                            <img class="w-full h-48 object-cover" src="/img/justin.png" alt="Justin Cardas">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900">Justin Cardas</h3>
+                                <p class="text-indigo-600 font-medium">UI/UX Designer</p>
+                                <p class="mt-2 text-gray-600 italic">"Design is where function meets beauty."</p>
+                            </div>
+                        </div>
+
+                        <!-- Ted Ip -->
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                            <img class="w-full h-48 object-cover" src="/img/ted.png" alt="Ted Ip">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900">Ted Ip</h3>
+                                <p class="text-indigo-600 font-medium">Quality Assurance</p>
+                                <p class="mt-2 text-gray-600 italic">"If it works, it's not complicated enough."</p>
+                            </div>
+                        </div>
+
+                        <!-- Mohammad Sadeghi -->
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                            <img class="w-full h-48 object-cover" src="/img/mohammad.png" alt="Mohammad Sadeghi">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900">Mohammad Sadeghi</h3>
+                                <p class="text-indigo-600 font-medium">Backend Specialist</p>
+                                <p class="mt-2 text-gray-600 italic">"If you don't test it, it's broken."</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Team Description -->
+                    <div class="mt-16 bg-white rounded-lg shadow-md p-8">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Our Team Culture</h2>
+                        <p class="text-gray-600 leading-relaxed">
+                            BBY-13 is a dynamic group of professionals dedicated to delivering exceptional results. 
+                            We combine diverse skills and perspectives to create innovative solutions. 
+                            Our collaborative approach ensures we leverage each member's strengths while 
+                            maintaining a supportive environment for growth and learning.
+                        </p>
+                    </div>
+                </div>
+            </main>
 
             <!-- Footer -->
             <%- include("partials/footer") %>
