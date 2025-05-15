@@ -6,11 +6,12 @@
     <%- include("partials/sliding_bar") %>
 
     <!-- Alert Popup -->
-     <%- include("partials/games/real-vs-ai-popup") %>
+     <%- include("partials/games/leaderboard-popup") %>
 
      <script>
         window.isLoggedIn = <%= isLoggedIn ? 'true' : 'false' %>;
      </script>
+     
     <script src="/scripts/leaderboard.js"></script>
 
     <main class="container mx-auto mt-8 flex-grow">

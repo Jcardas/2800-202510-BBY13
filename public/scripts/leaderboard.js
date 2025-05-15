@@ -1,6 +1,6 @@
 
 function closePopup() {
-    const popup = document.getElementById('popup');
+    const popup = document.getElementById('leaderboard-popup');
     popup.classList.add('hidden');
 }
 
@@ -10,14 +10,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         {
             return;
         }
-        const popup = document.getElementById('popup');
+        const popup = document.getElementById('leaderboard-popup');
         popup.classList.remove('hidden');
 
-    const popupTitle = document.getElementById('popup-title');
+    const popupTitle = document.getElementById('leaderboard-popup-title');
     popupTitle.innerText = 'Sign up to play!';
 
-    const popupMessage = document.getElementById('popup-message');
+    const popupMessage = document.getElementById('leaderboard-popup-message');
     popupMessage.innerText = 'Please sign up to save your score.';
 
-    document.getElementById('next-button').addEventListener('click', closePopup);
+    document.getElementById('close-button').addEventListener('click', closePopup);
 });

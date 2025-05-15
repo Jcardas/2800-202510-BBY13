@@ -7,53 +7,41 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Loaded saved font size: ${savedSize}px`);
     }
 
-
     console.log("Sliding Bar script loaded.");
     const increaseFontIcon = document.getElementById("increaseFontIcon");
 
     const toggleIcon = document.getElementById('toggleIcon');
-    const toggleIconPath = document.getElementById('toggleIconPath');
     const nav = document.getElementById('horizontalNav');
 
     if (toggleIcon && nav) {
         toggleIcon.addEventListener('click', () => {
             nav.classList.toggle('translate-x-0');
             nav.classList.toggle('translate-x-[calc(100%-60px)]');
-
-            const isCollapsed = nav.classList.contains('translate-x-[calc(100%-60px)]');
-            if (toggleIconPath) {
-                toggleIconPath.setAttribute("d", isCollapsed
-                    ? "M11 17l-5-5m0 0l5-5m-5 5h12"
-                    : "M13 7l5 5m0 0l-5 5m5-5H6"
-                );
-            }
         });
     } else {
         console.error("Required elements not found in the DOM.");
     }
 
     if (increaseFontIcon) {
-    increaseFontIcon.addEventListener("click", () => {
-      const root = document.documentElement;
-      const currentSize = parseFloat(getComputedStyle(root).fontSize); 
-      const newSize = Math.min(currentSize * 1.1, 24); // cap at 24px
-      root.style.fontSize = `${newSize}px`;
-      sessionStorage.setItem("fontSize", newSize); // Save to session
+        increaseFontIcon.addEventListener("click", () => {
+            const root = document.documentElement;
+            const currentSize = parseFloat(getComputedStyle(root).fontSize); 
+            const newSize = Math.min(currentSize * 1.1, 24); // cap at 24px
+            root.style.fontSize = `${newSize}px`;
+            sessionStorage.setItem("fontSize", newSize); // Save to session
 
-      console.log(`Font size increased to ${newSize}px`);
-    });
+            console.log(`Font size increased to ${newSize}px`);
+        });
     }
 
     const resetFontIcon = document.getElementById("resetFontIcon");
 
     if (resetFontIcon) {
-    resetFontIcon.addEventListener("click", () => {
-        document.documentElement.style.fontSize = "16px";
-        sessionStorage.removeItem("fontSize");
-        console.log("Font size reset to default (16px)");
-    });
+        resetFontIcon.addEventListener("click", () => {
+            document.documentElement.style.fontSize = "16px";
+            sessionStorage.removeItem("fontSize");
+            console.log("Font size reset to default (16px)");
+        });
     }
-
-
 
 });
