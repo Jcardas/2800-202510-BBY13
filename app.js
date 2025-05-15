@@ -108,13 +108,18 @@ function fromGamePage(req, res, next) {
   });
 }
 
-// Middleware- added for a responsive navbar
+// Middleware - added for a responsive navbar
 app.use((req, res, next) => {
   // Make user session data available in all templates
-  res.locals.user = req.session.authenticated ? {
-    username: req.session.username,
-    authenticated: true
-  } : null;
+  if (req.session.authenticated) {
+    res.locals.user = {
+      username: req.session.username,
+      authenticated: true,
+      profileImageUrl: req.session.profileImageUrl || '/icons/account_circle_black.svg'
+    };
+  } else {
+    res.locals.user = null;
+  }
   next();
 });
 
@@ -204,6 +209,16 @@ app.get("/leaderboard", async (req, res) => {
     res.status(500).render("404", { title: 'Server Error' });
   }
 });
+
+app.get("/account", isAuthenticated, (req, res) => {
+  res.render("account", {
+    title: 'Account',
+    isLoggedIn: req.session.authenticated === true,
+    username: req.session.username,
+    profileImageUrl: req.session.profileImageUrl || '/icons/account_circle_black.svg',
+  });
+});
+
 
 // Signup Form Submission
 app.post("/signup", async (req, res) => {
@@ -309,7 +324,6 @@ app.get("/api/image/:type", fromGamePage, async (req, res) => {
 
 //Creating scammer joke with ChatGPT API
 const OpenAI = require("openai");
-const { time } = require("console");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -447,54 +461,109 @@ app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
   });
 });
 
-  // Admin Image Upload
-  app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
-    try {
-      if (!req.file) {
-        req.session.message = 'No image file uploaded.';
-        return res.redirect('/admin');
-      }
-
-      const type = req.body.type.toLowerCase();
-      const schema = Joi.object({
-        type: Joi.string().valid('ai', 'real').required()
-      });
-      const { error } = schema.validate({ type });
-      if (error) {
-        req.session.message = 'Invalid type: must be "ai" or "real"';
-        return res.redirect('/admin');
-      }
-
-      const image_uuid = uuid();
-      const base64Image = req.file.buffer.toString('base64');
-
-      const result = await cloudinary.uploader.upload(
-        `data:${req.file.mimetype};base64,${base64Image}`,
-        {
-          public_id: image_uuid,
-          folder: 'ai-vs-real-images'
-        }
-      );
-
-      if (!result?.secure_url) {
-        req.session.message = 'Cloudinary upload failed';
-        return res.redirect('/admin');
-      }
-
-      await imageCollection.insertOne({
-        url: result.secure_url,
-        type: type
-      });
-
-      req.session.message = 'Image successfully uploaded!';
+// Admin Image Upload
+app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      req.session.message = 'No image file uploaded.';
       return res.redirect('/admin');
-
-    } catch (err) {
-      console.error(err);
-      req.session.message = 'Error uploading image';
-      res.redirect('/admin');
     }
-  });
+
+    const type = req.body.type.toLowerCase();
+    const schema = Joi.object({
+      type: Joi.string().valid('ai', 'real').required()
+    });
+    const { error } = schema.validate({ type });
+    if (error) {
+      req.session.message = 'Invalid type: must be "ai" or "real"';
+      return res.redirect('/admin');
+    }
+
+    const image_uuid = uuid();
+    const base64Image = req.file.buffer.toString('base64');
+
+    const result = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${base64Image}`,
+      {
+        public_id: image_uuid,
+        folder: 'ai-vs-real-images'
+      }
+    );
+
+    if (!result?.secure_url) {
+      req.session.message = 'Cloudinary upload failed';
+      return res.redirect('/admin');
+    }
+
+    await imageCollection.insertOne({
+      url: result.secure_url,
+      type: type
+    });
+
+    req.session.message = 'Image successfully uploaded!';
+    return res.redirect('/admin');
+
+  } catch (err) {
+    console.error(err);
+    req.session.message = 'Error uploading image';
+    res.redirect('/admin');
+  }
+});
+
+// takes the username and profileImage file from the form on the account page
+// and updates the user in the database, uploading the new image to cloudinary
+app.post("/account/update", isAuthenticated, upload.single('profileImage'), async (req, res) => {
+  try {
+    const username = req.body.username;
+    const removeProfileImage = req.body.removeProfileImage === 'true';
+    const profileImage = req.file;
+
+    // Validate username
+    const schema = Joi.object({
+      username: Joi.string().min(3).max(20).required()
+    });
+
+    const { error } = schema.validate({ username });
+    if (error) {
+      req.session.message = 'Invalid username';
+      return res.status(400).send('Invalid username');
+    }
+
+    // Prepare update data
+    const updateData = { username };
+
+    if (removeProfileImage) {
+      updateData.profileImageUrl = null;
+    } else if (profileImage) {
+      const result = await cloudinary.uploader.upload(
+        `data:${profileImage.mimetype};base64,${profileImage.buffer.toString('base64')}`,
+        { folder: 'profile-images' }
+      );
+      updateData.profileImageUrl = result.secure_url;
+    }
+
+    await userCollection.updateOne(
+      { email: req.session.email },
+      { $set: updateData }
+    );
+
+    // Update session data
+    req.session.username = username;
+    if ('profileImageUrl' in updateData) {
+      req.session.profileImageUrl = updateData.profileImageUrl || '/icons/account_circle_black.svg';
+    }
+
+    req.session.message = 'Profile updated successfully!';
+    res.status(200).send('Profile updated');
+  } catch (error) {
+    console.error("Error updating account:", error);
+    req.session.message = 'Failed to update account.';
+    res.status(500).send('Failed to update account');
+  }
+});
+
+  
+
 
 // Submit Score if user is authenticated
 app.post("/api/score", isAuthenticated, async (req, res) => {
