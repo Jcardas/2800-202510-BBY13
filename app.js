@@ -331,6 +331,7 @@ app.get("/api/joke", async (req, res) => {
 // Information Hub Routes
 app.get("/admin/information", isAuthenticated, isAdmin, async (req, res) => {
   try {
+<<<<<<< HEAD
       const existingPages = await database.db(MONGODB_DATABASE)
           .collection("information")
           .find({}, { 
@@ -357,12 +358,28 @@ app.get("/admin/information", isAuthenticated, isAdmin, async (req, res) => {
   } catch (error) {
       console.error("Error fetching information pages:", error);
       res.status(500).render("500", { title: 'Server Error' });
+=======
+    // Get all information pages for listing
+    const pages = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .find({}, { projection: { title: 1, slug: 1, description: 1 } })
+      .toArray();
+
+    res.render("information-list", {
+      title: 'Information Hub',
+      pages
+    });
+  } catch (error) {
+    console.error("Error fetching information pages:", error);
+    res.status(500).render("500");
+>>>>>>> fc4c7bbc36845674eaf4e8a6807283be194606e1
   }
 });
 
 // Dynamic Information Page
 app.get("/information/:slug", async (req, res) => {
   try {
+<<<<<<< HEAD
       const slug = req.params.slug;
       const content = await database.db(MONGODB_DATABASE)
           .collection("information")
@@ -382,6 +399,23 @@ app.get("/information/:slug", async (req, res) => {
       res.status(500).render("500", { title: 'Server Error' });
     }
   });
+=======
+    const slug = req.params.slug;
+
+    const content = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .findOne({ slug });
+
+    res.render("information", {
+      title: content?.title || 'Information',
+      content
+    });
+  } catch (error) {
+    console.error("Error fetching information page:", error);
+    res.status(500).render("500");
+  }
+});
+>>>>>>> fc4c7bbc36845674eaf4e8a6807283be194606e1
 
 // Endpoint to get a hint related to the description tag of the image pulled from database
 app.get("/api/hint/:description", async (req, res) => {
@@ -425,8 +459,8 @@ app.get("/api/hint/:description", async (req, res) => {
 // Only accessible to authenticated users with admin role
 // This page will be used to add new images to the database
 app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
-    const message = req.session.message;
-    delete req.session.message;
+  const message = req.session.message;
+  delete req.session.message;
 
   res.render('admin', {
     title: 'Admin Dashboard',
@@ -434,54 +468,64 @@ app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
   });
 });
 
-  // Admin Image Upload
-  app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
-    try {
-      if (!req.file) {
-        req.session.message = 'No image file uploaded.';
-        return res.redirect('/admin');
-      }
-
-      const type = req.body.type.toLowerCase();
-      const schema = Joi.object({
-        type: Joi.string().valid('ai', 'real').required()
-      });
-      const { error } = schema.validate({ type });
-      if (error) {
-        req.session.message = 'Invalid type: must be "ai" or "real"';
-        return res.redirect('/admin');
-      }
-
-      const image_uuid = uuid();
-      const base64Image = req.file.buffer.toString('base64');
-
-      const result = await cloudinary.uploader.upload(
-        `data:${req.file.mimetype};base64,${base64Image}`,
-        {
-          public_id: image_uuid,
-          folder: 'ai-vs-real-images'
-        }
-      );
-
-      if (!result?.secure_url) {
-        req.session.message = 'Cloudinary upload failed';
-        return res.redirect('/admin');
-      }
-
-      await imageCollection.insertOne({
-        url: result.secure_url,
-        type: type
-      });
-
-      req.session.message = 'Image successfully uploaded!';
+// Admin Image Upload
+app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      req.session.message = 'No image file uploaded.';
       return res.redirect('/admin');
-
-    } catch (err) {
-      console.error(err);
-      req.session.message = 'Error uploading image';
-      res.redirect('/admin');
     }
-  });
+
+    const type = req.body.type.toLowerCase();
+    const description = req.body.description;
+    const descriptionSchema = Joi.string().required();
+
+    const { error: descriptionError } = descriptionSchema.validate(description);
+    if (descriptionError) {
+      req.session.message = 'Invalid description: must be a non-empty string';
+      return res.redirect('/admin');
+    }
+
+    const schema = Joi.object({
+      type: Joi.string().valid('ai', 'real').required()
+    });
+    const { error } = schema.validate({ type });
+    if (error) {
+      req.session.message = 'Invalid type: must be "ai" or "real"';
+      return res.redirect('/admin');
+    }
+
+    const image_uuid = uuid();
+    const base64Image = req.file.buffer.toString('base64');
+
+    const result = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${base64Image}`,
+      {
+        public_id: image_uuid,
+        folder: 'ai-vs-real-images'
+      }
+    );
+
+    if (!result?.secure_url) {
+      req.session.message = 'Cloudinary upload failed';
+      return res.redirect('/admin');
+    }
+
+    await imageCollection.insertOne({
+      url: result.secure_url,
+      type: type,
+      description: description
+    });
+
+    req.session.message = 'Image successfully uploaded!';
+    return res.redirect('/admin');
+
+  } catch (err) {
+    console.error(err);
+    req.session.message = 'Error uploading image';
+    res.redirect('/admin');
+  }
+});
 
 // Submit Score if user is authenticated
 app.post("/api/score", isAuthenticated, async (req, res) => {
@@ -515,6 +559,7 @@ app.post("/api/score", isAuthenticated, async (req, res) => {
 // Admin Information Management
 app.get("/admin/information", isAuthenticated, isAdmin, async (req, res) => {
   try {
+<<<<<<< HEAD
       const existingPages = await database.db(MONGODB_DATABASE)
           .collection("information")
           .find({}, { 
@@ -536,11 +581,26 @@ app.get("/admin/information", isAuthenticated, isAdmin, async (req, res) => {
   } catch (error) {
       console.error("Error fetching information pages:", error);
       res.status(500).render("500", { title: 'Server Error' });
+=======
+    const existingPages = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .find({}, { projection: { title: 1, slug: 1 } })
+      .toArray();
+
+    res.render("admin-information", {
+      title: 'Manage Information Pages',
+      existingPages
+    });
+  } catch (error) {
+    console.error("Error fetching information pages:", error);
+    res.status(500).render("500");
+>>>>>>> fc4c7bbc36845674eaf4e8a6807283be194606e1
   }
 });
 
 app.post("/admin/information/add", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
   try {
+<<<<<<< HEAD
       const { title, slug, description, body } = req.body;
       
       const schema = Joi.object({
@@ -676,6 +736,63 @@ app.post("/admin/information/delete/:slug", isAuthenticated, isAdmin, async (req
       console.error("Error deleting page:", error);
       req.session.message = { type: 'error', text: 'Failed to delete page' };
       res.redirect('/admin/information');
+=======
+    const { title, slug, description, body } = req.body;
+
+    // Validation
+    const schema = Joi.object({
+      title: Joi.string().required(),
+      slug: Joi.string().required().pattern(/^[a-z0-9-]+$/),
+      description: Joi.string().required(),
+      body: Joi.string().required()
+    });
+
+    const { error } = schema.validate({ title, slug, description, body });
+    if (error) {
+      req.session.message = { type: 'error', text: error.details[0].message };
+      return res.redirect('/admin/information');
+    }
+
+    // Check if slug already exists
+    const existingPage = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .findOne({ slug });
+
+    if (existingPage) {
+      req.session.message = { type: 'error', text: 'Slug already exists' };
+      return res.redirect('/admin/information');
+    }
+
+    // Handle image upload if present
+    let imageUrl = '';
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(
+        `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
+        { folder: 'information-pages' }
+      );
+      imageUrl = result.secure_url;
+    }
+
+    // Insert new page
+    await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .insertOne({
+        title,
+        slug,
+        description,
+        body,
+        imageUrl,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+
+    req.session.message = { type: 'success', text: 'Page created successfully' };
+    res.redirect('/admin/information');
+  } catch (error) {
+    console.error("Error adding information page:", error);
+    req.session.message = { type: 'error', text: 'Failed to create page' };
+    res.redirect('/admin/information');
+>>>>>>> fc4c7bbc36845674eaf4e8a6807283be194606e1
   }
 });
 
@@ -717,25 +834,25 @@ app.post("/admin/information/update/:slug", isAuthenticated, isAdmin, upload.sin
   // Similar to add route but with update logic
 });
 
-  // Logout
-  app.get("/logout", (req, res) => {
-    req.session.destroy();
-    res.redirect("/");
-  });
+// Logout
+app.get("/logout", (req, res) => {
+  req.session.destroy();
+  res.redirect("/");
+});
 
-  app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/public"));
 
-  // 404 Fallback
-  app.get("/*dummy", (req, res) => {
-    res.status(404);
-    res.render("404", {
-      title: 'Page not found'
-    })
-  });
+// 404 Fallback
+app.get("/*dummy", (req, res) => {
+  res.status(404);
+  res.render("404", {
+    title: 'Page not found'
+  })
+});
 
-  // Start server
-  app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-  });
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
 
 
