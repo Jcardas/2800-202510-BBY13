@@ -16,7 +16,7 @@ function changeProfileImage() {
 
 function removeImageFile() {
     profileImageInput.value = null;
-    profileImage.src = '';
+    profileImage.src = '/icons/account_circle_black.svg';
     profileImageInput.dataset.removed = "true"; // Mark as removed
 }
 
