@@ -65,8 +65,7 @@ app.use(
 );
 
 //Helper function to format leaderboard time as #:##
-function formatTime(seconds)
-{
+function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
@@ -127,8 +126,8 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).render('500', {
-      title: 'Server Error',
-      error: process.env.NODE_ENV === 'development' ? err : {}
+    title: 'Server Error',
+    error: process.env.NODE_ENV === 'development' ? err : {}
   });
 });
 
@@ -192,18 +191,34 @@ app.get("/about", (req, res) => {
 
 app.get("/leaderboard", async (req, res) => {
   try {
-    // Fetch scores from the database
-    const leaderboard = await scoresCollection
-    .find({})
-    .sort({ score:-1, time: 1 }) 
-    .limit(6)
-    .toArray();
+    const leaderboard = await scoresCollection.aggregate([
+      { $sort: { score: -1, time: 1 } },
+      { $limit: 6 },
+      {
+        $lookup: {
+          from: "users",             // join with the 'users' collection
+          localField: "userId",      // match this field from 'scores'
+          foreignField: "_id",       // with this field from 'users'
+          as: "user"                 // call the joined data 'user'
+        }
+      },
+      { $unwind: "$user" },          // convert user array to an object
+      {
+        $project: {
+          score: 1,
+          total: 1,
+          time: 1,
+          username: "$user.username",
+          profileImageUrl: "$user.profileImageUrl"
+        }
+      }
+    ]).toArray();
 
     res.render('leaderboard', {
-    leaderboard,
-    title: 'Leaderboard',
-    isLoggedIn: req.session.authenticated === true
-  });
+      leaderboard,
+      title: 'Leaderboard',
+      isLoggedIn: req.session.authenticated === true
+    });
   } catch (error) {
     console.error("Error fetching leaderboard data:", error);
     res.status(500).render("404", { title: 'Server Error' });
@@ -226,8 +241,8 @@ app.post("/signup", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-    // Store form data in session in case we need to redirect back
-    req.session.formData = { username, email };
+  // Store form data in session in case we need to redirect back
+  req.session.formData = { username, email };
 
   const schema = Joi.object({
     username: Joi.string().required(),
@@ -358,57 +373,57 @@ app.get("/api/joke", async (req, res) => {
 // Information Hub Routes
 app.get("/admin/information", isAuthenticated, isAdmin, async (req, res) => {
   try {
-      const existingPages = await database.db(MONGODB_DATABASE)
-          .collection("information")
-          .find({}, { 
-              projection: { 
-                  title: 1, 
-                  slug: 1,
-                  updatedAt: 1 
-              },
-              sort: { updatedAt: -1 }
-          })
-          .toArray();
+    const existingPages = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .find({}, {
+        projection: {
+          title: 1,
+          slug: 1,
+          updatedAt: 1
+        },
+        sort: { updatedAt: -1 }
+      })
+      .toArray();
 
-      // Get form data from session if it exists
-      const formData = req.session.formData || {};
-      delete req.session.formData;
+    // Get form data from session if it exists
+    const formData = req.session.formData || {};
+    delete req.session.formData;
 
-      res.render("admin-information", {
-          title: 'Manage Information Pages',
-          existingPages,
-          message: req.session.message,
-          formData // Pass form data back to the template
-      });
-      delete req.session.message;
+    res.render("admin-information", {
+      title: 'Manage Information Pages',
+      existingPages,
+      message: req.session.message,
+      formData // Pass form data back to the template
+    });
+    delete req.session.message;
   } catch (error) {
-      console.error("Error fetching information pages:", error);
-      res.status(500).render("500", { title: 'Server Error' });
+    console.error("Error fetching information pages:", error);
+    res.status(500).render("500", { title: 'Server Error' });
   }
 });
 
 // Dynamic Information Page
 app.get("/information/:slug", async (req, res) => {
   try {
-      const slug = req.params.slug;
-      const content = await database.db(MONGODB_DATABASE)
-          .collection("information")
-          .findOne({ slug });
+    const slug = req.params.slug;
+    const content = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .findOne({ slug });
 
-      if (!content) {
-          return res.status(404).render("404", { title: 'Page Not Found' });
-      }
-
-      res.render("information", { 
-          title: content.title,
-          content,
-          isLoggedIn: req.session.authenticated || false
-      });
-  } catch (error) {
-      console.error("Error fetching information page:", error);
-      res.status(500).render("500", { title: 'Server Error' });
+    if (!content) {
+      return res.status(404).render("404", { title: 'Page Not Found' });
     }
-  });
+
+    res.render("information", {
+      title: content.title,
+      content,
+      isLoggedIn: req.session.authenticated || false
+    });
+  } catch (error) {
+    console.error("Error fetching information page:", error);
+    res.status(500).render("500", { title: 'Server Error' });
+  }
+});
 
 // Endpoint to get a hint related to the description tag of the image pulled from database
 app.get("/api/hint/:description", async (req, res) => {
@@ -452,8 +467,8 @@ app.get("/api/hint/:description", async (req, res) => {
 // Only accessible to authenticated users with admin role
 // This page will be used to add new images to the database
 app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
-    const message = req.session.message;
-    delete req.session.message;
+  const message = req.session.message;
+  delete req.session.message;
 
   res.render('admin', {
     title: 'Admin Dashboard',
@@ -562,20 +577,17 @@ app.post("/account/update", isAuthenticated, upload.single('profileImage'), asyn
   }
 });
 
-  
-
-
 // Submit Score if user is authenticated
 app.post("/api/score", isAuthenticated, async (req, res) => {
   try {
     const { score, total, timeTaken } = req.body;
+    const user = await userCollection.findOne({ email: req.session.email });
 
     //Format time
     const formattedTime = formatTime(Number(timeTaken));
 
     await scoresCollection.insertOne({
-      email: req.session.email,
-      username: req.session.username,
+      userId: user._id,
       score,
       total,
       time: formattedTime,
@@ -583,8 +595,7 @@ app.post("/api/score", isAuthenticated, async (req, res) => {
     });
 
     console.log("Score saved successfully:", {
-      email: req.session.email,
-      username: req.session.username,
+      userId: user._id,
       score,
       total,
       time: formattedTime,
@@ -600,201 +611,201 @@ app.post("/api/score", isAuthenticated, async (req, res) => {
 // Admin Information Management
 app.get("/admin/information", isAuthenticated, isAdmin, async (req, res) => {
   try {
-      const existingPages = await database.db(MONGODB_DATABASE)
-          .collection("information")
-          .find({}, { 
-              projection: { 
-                  title: 1, 
-                  slug: 1,
-                  updatedAt: 1 
-              },
-              sort: { updatedAt: -1 }
-          })
-          .toArray();
+    const existingPages = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .find({}, {
+        projection: {
+          title: 1,
+          slug: 1,
+          updatedAt: 1
+        },
+        sort: { updatedAt: -1 }
+      })
+      .toArray();
 
-      res.render("admin-information", {
-          title: 'Manage Information Pages',
-          existingPages,
-          message: req.session.message
-      });
-      delete req.session.message;
+    res.render("admin-information", {
+      title: 'Manage Information Pages',
+      existingPages,
+      message: req.session.message
+    });
+    delete req.session.message;
   } catch (error) {
-      console.error("Error fetching information pages:", error);
-      res.status(500).render("500", { title: 'Server Error' });
+    console.error("Error fetching information pages:", error);
+    res.status(500).render("500", { title: 'Server Error' });
   }
 });
 
 app.post("/admin/information/add", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
   try {
-      const { title, slug, description, body } = req.body;
-      
-      const schema = Joi.object({
-          title: Joi.string().min(3).max(100).required(),
-          slug: Joi.string().pattern(/^[a-z0-9-]+$/).required(),
-          description: Joi.string().min(10).max(200).required()
-              .messages({
-                  'string.min': 'Description must be at least 10 characters',
-                  'string.max': 'Description cannot exceed 200 characters'
-              }),
-          body: Joi.string().min(10).required()
-      });
+    const { title, slug, description, body } = req.body;
 
-      const { error } = schema.validate({ title, slug, description, body });
-      if (error) {
-          // Preserve form data in session to repopulate the form
-          req.session.formData = { title, slug, description, body };
-          req.session.message = { 
-              type: 'error', 
-              text: error.details[0].message 
-            
-          };
-          return res.redirect('/admin/information');
-      }
+    const schema = Joi.object({
+      title: Joi.string().min(3).max(100).required(),
+      slug: Joi.string().pattern(/^[a-z0-9-]+$/).required(),
+      description: Joi.string().min(10).max(200).required()
+        .messages({
+          'string.min': 'Description must be at least 10 characters',
+          'string.max': 'Description cannot exceed 200 characters'
+        }),
+      body: Joi.string().min(10).required()
+    });
 
-      // Check for existing slug
-      const existingPage = await database.db(MONGODB_DATABASE)
-          .collection("information")
-          .findOne({ slug });
+    const { error } = schema.validate({ title, slug, description, body });
+    if (error) {
+      // Preserve form data in session to repopulate the form
+      req.session.formData = { title, slug, description, body };
+      req.session.message = {
+        type: 'error',
+        text: error.details[0].message
 
-      if (existingPage) {
-          req.session.message = { 
-              type: 'error', 
-              text: 'This URL slug is already in use' 
-          };
-          return res.redirect('/admin/information');
-      }
+      };
+      return res.redirect('/admin/information');
+    }
 
-      // Handle image upload
-      let imageUrl = '';
-      if (req.file) {
-          try {
-              const result = await cloudinary.uploader.upload(
-                  `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
-                  { 
-                      folder: 'information-pages',
-                      quality: 'auto:good',
-                      fetch_format: 'auto'
-                  }
-              );
-              imageUrl = result.secure_url;
-          } catch (uploadError) {
-              console.error("Cloudinary upload failed:", uploadError);
-              req.session.message = { 
-                  type: 'error', 
-                  text: 'Failed to upload image' 
-              };
-              return res.redirect('/admin/information');
+    // Check for existing slug
+    const existingPage = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .findOne({ slug });
+
+    if (existingPage) {
+      req.session.message = {
+        type: 'error',
+        text: 'This URL slug is already in use'
+      };
+      return res.redirect('/admin/information');
+    }
+
+    // Handle image upload
+    let imageUrl = '';
+    if (req.file) {
+      try {
+        const result = await cloudinary.uploader.upload(
+          `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
+          {
+            folder: 'information-pages',
+            quality: 'auto:good',
+            fetch_format: 'auto'
           }
+        );
+        imageUrl = result.secure_url;
+      } catch (uploadError) {
+        console.error("Cloudinary upload failed:", uploadError);
+        req.session.message = {
+          type: 'error',
+          text: 'Failed to upload image'
+        };
+        return res.redirect('/admin/information');
       }
+    }
 
-      // Create document
-      const now = new Date();
-      const document = {
-          title,
-          slug,
-          description,
-          body,
-          imageUrl: imageUrl || null,
-          createdAt: now,
-          updatedAt: now
-      };
+    // Create document
+    const now = new Date();
+    const document = {
+      title,
+      slug,
+      description,
+      body,
+      imageUrl: imageUrl || null,
+      createdAt: now,
+      updatedAt: now
+    };
 
-      // Insert into database
-      const insertResult = await database.db(MONGODB_DATABASE)
-          .collection("information")
-          .insertOne(document);
+    // Insert into database
+    const insertResult = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .insertOne(document);
 
-      if (!insertResult.acknowledged) {
-          throw new Error('Database insertion failed');
-      }
+    if (!insertResult.acknowledged) {
+      throw new Error('Database insertion failed');
+    }
 
-      req.session.message = { 
-          type: 'success', 
-          text: 'Page created successfully!' 
-      };
-      return res.redirect('/admin/information');
+    req.session.message = {
+      type: 'success',
+      text: 'Page created successfully!'
+    };
+    return res.redirect('/admin/information');
 
-    } catch (error) {
-      console.error("Error in form submission:", error);
-      req.session.message = { 
-          type: 'error', 
-          text: 'Failed to create page. Please try again.' 
-      };
-      return res.redirect('/admin/information');
+  } catch (error) {
+    console.error("Error in form submission:", error);
+    req.session.message = {
+      type: 'error',
+      text: 'Failed to create page. Please try again.'
+    };
+    return res.redirect('/admin/information');
   }
 });
 
 // Edit Page Route
 app.get("/admin/information/edit/:slug", isAuthenticated, isAdmin, async (req, res) => {
   try {
-      const page = await database.db(MONGODB_DATABASE)
-          .collection("information")
-          .findOne({ slug: req.params.slug });
+    const page = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .findOne({ slug: req.params.slug });
 
-      if (!page) {
-          req.session.message = { type: 'error', text: 'Page not found' };
-          return res.redirect('/admin/information');
-      }
+    if (!page) {
+      req.session.message = { type: 'error', text: 'Page not found' };
+      return res.redirect('/admin/information');
+    }
 
-      res.render("admin-information-edit", {
-          title: 'Edit Page',
-          page
-      });
+    res.render("admin-information-edit", {
+      title: 'Edit Page',
+      page
+    });
   } catch (error) {
-      console.error("Error fetching page:", error);
-      res.status(500).render("500", { title: 'Server Error' });
+    console.error("Error fetching page:", error);
+    res.status(500).render("500", { title: 'Server Error' });
   }
 });
 
 app.post("/admin/information/delete/:slug", isAuthenticated, isAdmin, async (req, res) => {
   try {
-      const result = await database.db(MONGODB_DATABASE)
-          .collection("information")
-          .deleteOne({ slug: req.params.slug });
+    const result = await database.db(MONGODB_DATABASE)
+      .collection("information")
+      .deleteOne({ slug: req.params.slug });
 
-      if (result.deletedCount === 0) {
-          req.session.message = { type: 'error', text: 'Page not found' };
-      } else {
-          req.session.message = { type: 'success', text: 'Page deleted successfully' };
-      }
-      res.redirect('/admin/information');
+    if (result.deletedCount === 0) {
+      req.session.message = { type: 'error', text: 'Page not found' };
+    } else {
+      req.session.message = { type: 'success', text: 'Page deleted successfully' };
+    }
+    res.redirect('/admin/information');
   } catch (error) {
-      console.error("Error deleting page:", error);
-      req.session.message = { type: 'error', text: 'Failed to delete page' };
-      res.redirect('/admin/information');
+    console.error("Error deleting page:", error);
+    req.session.message = { type: 'error', text: 'Failed to delete page' };
+    res.redirect('/admin/information');
   }
 });
 
 app.get("/information", async (req, res) => {
   try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = 10;
-      const skip = (page - 1) * limit;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
 
-      const [pages, count] = await Promise.all([
-          database.db(MONGODB_DATABASE)
-              .collection("information")
-              .find({}, { 
-                  projection: { title: 1, slug: 1, description: 1 },
-                  sort: { createdAt: -1 },
-                  skip,
-                  limit
-              })
-              .toArray(),
-          database.db(MONGODB_DATABASE)
-              .collection("information")
-              .countDocuments()
-      ]);
+    const [pages, count] = await Promise.all([
+      database.db(MONGODB_DATABASE)
+        .collection("information")
+        .find({}, {
+          projection: { title: 1, slug: 1, description: 1 },
+          sort: { createdAt: -1 },
+          skip,
+          limit
+        })
+        .toArray(),
+      database.db(MONGODB_DATABASE)
+        .collection("information")
+        .countDocuments()
+    ]);
 
-      res.render("information-list", { 
-          title: 'Information Hub',
-          pages,
-          currentPage: page,
-          totalPages: Math.ceil(count / limit),
-          isLoggedIn: req.session.authenticated || false
-      });
+    res.render("information-list", {
+      title: 'Information Hub',
+      pages,
+      currentPage: page,
+      totalPages: Math.ceil(count / limit),
+      isLoggedIn: req.session.authenticated || false
+    });
   } catch (error) {
-      // Error handling
+    // Error handling
   }
 });
 
@@ -803,25 +814,25 @@ app.post("/admin/information/update/:slug", isAuthenticated, isAdmin, upload.sin
   // Similar to add route but with update logic
 });
 
-  // Logout
-  app.get("/logout", (req, res) => {
-    req.session.destroy();
-    res.redirect("/");
-  });
+// Logout
+app.get("/logout", (req, res) => {
+  req.session.destroy();
+  res.redirect("/");
+});
 
-  app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/public"));
 
-  // 404 Fallback
-  app.get("/*dummy", (req, res) => {
-    res.status(404);
-    res.render("404", {
-      title: 'Page not found'
-    })
-  });
+// 404 Fallback
+app.get("/*dummy", (req, res) => {
+  res.status(404);
+  res.render("404", {
+    title: 'Page not found'
+  })
+});
 
-  // Start server
-  app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-  });
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
 
 
