@@ -226,11 +226,16 @@ app.get("/leaderboard", async (req, res) => {
 });
 
 app.get("/account", isAuthenticated, (req, res) => {
+
+  const message = req.session.message;
+  delete req.session.message;
+
   res.render("account", {
     title: 'Account',
     isLoggedIn: req.session.authenticated === true,
     username: req.session.username,
     profileImageUrl: req.session.profileImageUrl || '/icons/account_circle_black.svg',
+    message
   });
 });
 
@@ -307,6 +312,7 @@ app.post("/login", async (req, res) => {
   req.session.username = user.username;
   req.session.email = user.email;
   req.session.role = user.role;
+  req.session.profileImageUrl = user.profileImageUrl || '/icons/account_circle_black.svg';
 
   res.redirect("/");
 });
@@ -544,6 +550,16 @@ app.post("/account/update", isAuthenticated, upload.single('profileImage'), asyn
       return res.status(400).send('Invalid username');
     }
 
+    // Check if no updates were made so we can skip the update (dont need to write to the database)
+    const currentUser = await userCollection.findOne({ email: req.session.email });
+    const usernameUnchanged = currentUser.username === username;
+    const imageUnchanged = !removeProfileImage && !profileImage;
+
+    if (usernameUnchanged && imageUnchanged) {
+      req.session.message = 'No changes made.';
+      return res.status(200).send('No changes made.');
+    }
+
     // Prepare update data
     const updateData = { username };
 
@@ -565,7 +581,7 @@ app.post("/account/update", isAuthenticated, upload.single('profileImage'), asyn
     // Update session data
     req.session.username = username;
     if ('profileImageUrl' in updateData) {
-      req.session.profileImageUrl = updateData.profileImageUrl || '/icons/account_circle_black.svg';
+      req.session.profileImageUrl = updateData.profileImageUrl ?? '/icons/account_circle_black.svg';
     }
 
     req.session.message = 'Profile updated successfully!';
