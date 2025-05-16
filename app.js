@@ -491,6 +491,7 @@ app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), asyn
     }
 
     const type = req.body.type.toLowerCase();
+    const description = req.body.description;
     const schema = Joi.object({
       type: Joi.string().valid('ai', 'real').required()
     });
@@ -518,7 +519,8 @@ app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), asyn
 
     await imageCollection.insertOne({
       url: result.secure_url,
-      type: type
+      type: type,
+      description: description
     });
 
     req.session.message = 'Image successfully uploaded!';
