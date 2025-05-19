@@ -565,14 +565,23 @@ app.post("/account/update", isAuthenticated, upload.single('profileImage'), asyn
     // Prepare update data
     const updateData = { username };
 
+    // Delete old image if needed
+    if ((removeProfileImage || profileImage) && currentUser.profileImageId) {
+      await cloudinary.uploader.destroy(currentUser.profileImageId);
+    }
+
     if (removeProfileImage) {
       updateData.profileImageUrl = null;
+      updateData.profileImageId = null;
     } else if (profileImage) {
       const result = await cloudinary.uploader.upload(
         `data:${profileImage.mimetype};base64,${profileImage.buffer.toString('base64')}`,
         { folder: 'profile-images' }
       );
       updateData.profileImageUrl = result.secure_url;
+
+      // Store the public ID in the database for future deletion
+      updateData.profileImageId = result.public_id;
     }
 
     await userCollection.updateOne(
