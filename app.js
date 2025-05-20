@@ -183,6 +183,13 @@ app.get("/real-vs-ai-game", (req, res) => {
   });
 });
 
+app.get("/have-i-been-scammed", (req, res) => {
+  res.render("have-i-been-scammed", {
+    title: 'Have I Been Scammed?',
+    isLoggedIn: req.session.authenticated || false
+  });
+});
+
 app.get("/about", (req, res) => {
   res.render("about", {
     title: 'About Us'
