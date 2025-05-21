@@ -259,9 +259,9 @@ app.get("/account", isAuthenticated, (req, res) => {
 
 // Signup Form Submission
 app.post("/signup", async (req, res) => {
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
+  const username = req.body.username.trim();
+  const email = req.body.email.trim();
+  const password = req.body.password.trim();
 
   // Store form data in session in case we need to redirect back
   req.session.formData = { username, email };
@@ -297,8 +297,8 @@ app.post("/signup", async (req, res) => {
 
 // Login Form Submission
 app.post("/login", async (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const email = req.body.email.trim();
+  const password = req.body.password.trim();
 
   const schema = Joi.object({
     email: Joi.string().email().required(),
@@ -647,7 +647,7 @@ app.post("/admin/scam-quiz/add", isAuthenticated, isAdmin, async (req, res) => {
 // and updates the user in the database, uploading the new image to cloudinary
 app.post("/account/update", isAuthenticated, upload.single('profileImage'), async (req, res) => {
   try {
-    const username = req.body.username;
+    const username = req.body.username.trim();
     const removeProfileImage = req.body.removeProfileImage === 'true';
     const profileImage = req.file;
 
