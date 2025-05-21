@@ -1,3 +1,5 @@
+// This script handles the navigation bar functionality, including mobile menu toggle and loading the navbar template.
+
 console.log('Navbar script loaded!');
 
 // document.addEventListener('DOMContentLoaded', () => {

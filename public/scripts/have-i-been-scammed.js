@@ -1,11 +1,16 @@
+// This script handles the have I been scammed quiz functionality.
+
+// set the total number of rounds and initialize the current round
 const totalRounds = 10;
 let currentRound = 0;
 
+// Initialize the score and the current question
 let score = 0;
 let gameStartTime = null;
 
 let progressBarFull;
 
+// Submit function for the quiz
 function submitAnswer() {
     // Get the selected answer
     const selected = document.querySelector('input[name="quiz-answer"]:checked');
@@ -30,6 +35,7 @@ function showNoAnswerPopup() {
     const popup = document.getElementById('no-answer-popup');
     popup.classList.remove('hidden');
 
+    // Animate popup: fade in and scale up
     const content = popup.querySelector('div');
     content.style.opacity = '0';
     content.style.transform = 'scale(0.95)';
@@ -110,6 +116,7 @@ function nextRound() {
             game: "quiz"
         };
 
+        // post the score to the server
         if (window.isLoggedIn) {
             fetch("/api/score", {
                 method: "POST",
@@ -151,6 +158,7 @@ function nextRound() {
     getQuestion();
 }
 
+// Function to fetch the question from the server
 async function getQuestion() {
     const response = await fetch('/api/scam-quiz');
     if (!response.ok) {
@@ -176,6 +184,7 @@ async function getQuestion() {
     });
 }
 
+// Function to update the progress bar
 function updateProgressBar() {
     const progressText = document.getElementById('progress-text');
 

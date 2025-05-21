@@ -1,9 +1,10 @@
-// TODO: Keep track of score after each round
+// This script handles the real vs ai game functionality, including image loading, selection, and score tracking.
 
 // Function to provide hints (For now, hints will be linked to the round)
 const totalRounds = 10;
 let currentRound = 0;
 
+// Initialize the next images to be preloaded
 let nextRealImageObj = '';
 let nextAiImageObj = '';
 
@@ -13,6 +14,7 @@ let score = 0; // Initialize score variable
 let realImageObj = '';
 let aiImageObj = '';
 
+// This will be used to store the left and right images
 let leftImage = null;
 let rightImage = null;
 
@@ -21,6 +23,7 @@ let rightImage = null;
 // depending on which one is the real image 
 let realImage = null;
 
+// This will be used to store the selected image
 let selectedImage = null;
 let progressBarFull;
 

@@ -1,3 +1,6 @@
+// This script handles information page functionality, including rich text editor, slug generation, and form submission.
+
+// on page load add event listeners
 document.addEventListener('DOMContentLoaded', function () {
     const editor = document.getElementById('editor');
     const bodyInput = document.getElementById('body');
@@ -73,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
         validateContent();
     }
 
+    // function to validate content
     function validateContent() {
         const hasContent = editor.textContent.trim().length > 0;
         contentError.classList.toggle('hidden', hasContent);
@@ -137,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Function to show messages
     function showMessage(text, type = 'success') {
         const messageDiv = document.createElement('div');
         messageDiv.className = `p-4 mb-4 text-sm rounded-lg ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
