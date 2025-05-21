@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const editor = document.getElementById('editor');
     const bodyInput = document.getElementById('body');
     const form = document.getElementById('pageForm');
@@ -15,13 +15,23 @@ document.addEventListener('DOMContentLoaded', function() {
     bodyInput.value = editor.innerHTML;
 
     // Slug generation logic
-    document.getElementById('title').addEventListener('input', function() {
-        if (!slugManuallyEdited) {
-            slugInput.value = this.value.toLowerCase()
-                .replace(/\s+/g, '-')
-                .replace(/[^\w-]+/g, '');
-        }
-    });
+    const titleInput = document.getElementById('title');
+
+    // Only auto-generate slug if the slug input is not readOnly (i.e., we're adding, not editing)
+    if (!slugInput.readOnly) {
+        titleInput.addEventListener('input', function () {
+            if (!slugManuallyEdited) {
+                slugInput.value = this.value.toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w-]+/g, '');
+            }
+        });
+
+        slugInput.addEventListener('input', () => {
+            slugManuallyEdited = true;
+        });
+    }
+
 
     slugInput.addEventListener('input', () => {
         slugManuallyEdited = true;
@@ -29,10 +39,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Rich text editor functionality
     document.querySelectorAll('#editorToolbar button').forEach(button => {
-        button.addEventListener('click', function(e) {
+        button.addEventListener('click', function (e) {
             e.preventDefault();
             const command = this.getAttribute('data-command');
-            
+
             if (command === 'createLink') {
                 const url = prompt('Enter the URL:');
                 if (url) {
@@ -43,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 document.execCommand(command, false, null);
             }
-            
+
             editor.focus();
             updateBodyValue();
         });
@@ -58,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clean empty paragraphs
         content = content.replace(/<p><br><\/p>/g, '');
         content = content.trim() || '';
-        
+
         bodyInput.value = content;
         validateContent();
     }
@@ -70,11 +80,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Image preview
-    document.getElementById('imageUpload').addEventListener('change', function(e) {
+    document.getElementById('imageUpload').addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(event) {
+            reader.onload = function (event) {
                 document.getElementById('previewImg').src = event.target.result;
                 document.getElementById('imagePreview').classList.remove('hidden');
             };
@@ -83,34 +93,34 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Form submission handling
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
+
         // Final validation
         updateBodyValue();
         const isContentValid = validateContent();
         const isFormValid = form.checkValidity() && isContentValid;
-        
+
         if (!isFormValid) {
             if (!isContentValid) {
                 editor.focus();
             }
             return;
         }
-        
+
         // Prepare for submission
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner"></span> Saving...';
-        
+
         try {
             // Use Fetch API for better error handling
             const formData = new FormData(form);
-            
+
             const response = await fetch(form.action, {
                 method: 'POST',
                 body: formData
             });
-            
+
             if (response.redirected) {
                 window.location.href = response.url;
             } else {
@@ -126,20 +136,19 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.innerHTML = 'Save Page';
         }
     });
-    
+
     function showMessage(text, type = 'success') {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `p-4 mb-4 text-sm rounded-lg ${
-            type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-        }`;
+        messageDiv.className = `p-4 mb-4 text-sm rounded-lg ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+            }`;
         messageDiv.textContent = text;
-        
+
         // Insert after the h1 heading
         const h1 = document.querySelector('main h1');
         if (h1) {
             h1.insertAdjacentElement('afterend', messageDiv);
         }
-        
+
         // Remove after 5 seconds
         setTimeout(() => {
             messageDiv.remove();
@@ -148,43 +157,43 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 // Client-side validation
 function validateForm() {
-const description = document.getElementById('description');
-const descriptionError = document.getElementById('descriptionError');
-let isValid = true;
+    const description = document.getElementById('description');
+    const descriptionError = document.getElementById('descriptionError');
+    let isValid = true;
 
-// Validate description length
-if (description.value.length < 10 || description.value.length > 200) {
-    descriptionError.classList.remove('hidden');
-    description.classList.add('border-red-500');
-    isValid = false;
-} else {
-    descriptionError.classList.add('hidden');
-    description.classList.remove('border-red-500');
-}
+    // Validate description length
+    if (description.value.length < 10 || description.value.length > 200) {
+        descriptionError.classList.remove('hidden');
+        description.classList.add('border-red-500');
+        isValid = false;
+    } else {
+        descriptionError.classList.add('hidden');
+        description.classList.remove('border-red-500');
+    }
 
-return isValid;
+    return isValid;
 }
 
 // Form submission handler
-document.getElementById('pageForm').addEventListener('submit', function(e) {
-if (!validateForm()) {
-    e.preventDefault();
-    // Scroll to the first error
-    const firstError = document.querySelector('.border-red-500');
-    if (firstError) {
-        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+document.getElementById('pageForm').addEventListener('submit', function (e) {
+    if (!validateForm()) {
+        e.preventDefault();
+        // Scroll to the first error
+        const firstError = document.querySelector('.border-red-500');
+        if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
-}
 });
 
 // Real-time validation
-document.getElementById('description').addEventListener('input', function() {
-const errorElement = document.getElementById('descriptionError');
-if (this.value.length < 10 || this.value.length > 200) {
-    this.classList.add('border-red-500');
-    errorElement.classList.remove('hidden');
-} else {
-    this.classList.remove('border-red-500');
-    errorElement.classList.add('hidden');
-}
+document.getElementById('description').addEventListener('input', function () {
+    const errorElement = document.getElementById('descriptionError');
+    if (this.value.length < 10 || this.value.length > 200) {
+        this.classList.add('border-red-500');
+        errorElement.classList.remove('hidden');
+    } else {
+        this.classList.remove('border-red-500');
+        errorElement.classList.add('hidden');
+    }
 });
