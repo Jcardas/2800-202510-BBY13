@@ -1,3 +1,6 @@
+// This script handles the account page functionality, including changing the profile image and updating the username.
+
+// set up the profile image and username input elements
 let profileImage = null;
 let profileImageInput = null;
 let usernameInput = null;
@@ -14,12 +17,14 @@ function changeProfileImage() {
     }
 }
 
+// Remove the profile image when the user clicks the remove button
 function removeImageFile() {
     profileImageInput.value = null;
     profileImage.src = '/icons/account_circle_black.svg';
     profileImageInput.dataset.removed = "true"; // Mark as removed
 }
 
+// Send changes to the server when the user clicks the save button
 function postAccountChanges() {
     const formData = new FormData();
 
@@ -46,24 +51,21 @@ function postAccountChanges() {
         .catch(error => {
             console.error('Error:', error);
         });
-
-        // TODO, display a success message to the user.
 }
 
-    
+// add event listeners to the buttons
+document.addEventListener('DOMContentLoaded', async () => {
 
-    document.addEventListener('DOMContentLoaded', async () => {
+    if (window.isLoggedIn === false) {
+        window.location.href = '/login';
+    }
 
-        if (window.isLoggedIn === false) {
-            window.location.href = '/login';
-        }
+    profileImage = document.getElementById('profile-image');
 
-        profileImage = document.getElementById('profile-image');
+    profileImageInput = document.getElementById('profile-image-input');
 
-        profileImageInput = document.getElementById('profile-image-input');
+    usernameInput = document.getElementById('username-input');
 
-        usernameInput = document.getElementById('username-input');
+    profileImageInput.addEventListener('change', changeProfileImage);
 
-        profileImageInput.addEventListener('change', changeProfileImage);
-
-    });
+});
