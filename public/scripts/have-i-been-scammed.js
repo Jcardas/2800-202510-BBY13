@@ -1,22 +1,59 @@
 const totalRounds = 10;
 let currentRound = 0;
 
+let score = 0;
+let gameStartTime = null;
+
 let progressBarFull;
 
 function submitAnswer() {
     // Get the selected answer
     const selected = document.querySelector('input[name="quiz-answer"]:checked');
     if (!selected) {
-        alert('Please select an answer!');
+        showNoAnswerPopup();
         return;
     }
     const selectedIdx = parseInt(selected.value, 10);
     const isCorrect = selectedIdx === currentQuestion.correctIndex;
 
+    // Add 1 to score if the answer is correct
+    if (isCorrect) {
+        score++;
+    }
+
     // Show the popup with the result and explanation
     scamQuizAlert(isCorrect, currentQuestion.explanation);
 };
 
+// Function to show the no answer popup
+function showNoAnswerPopup() {
+    const popup = document.getElementById('no-answer-popup');
+    popup.classList.remove('hidden');
+
+    const content = popup.querySelector('div');
+    content.style.opacity = '0';
+    content.style.transform = 'scale(0.95)';
+    requestAnimationFrame(() => {
+        content.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        content.style.opacity = '1';
+        content.style.transform = 'scale(1)';
+    });
+}
+
+// Function to close the no answer popup
+function closeNoAnswerPopup() {
+    const popup = document.getElementById('no-answer-popup');
+    const content = popup.querySelector('div');
+    content.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    content.style.opacity = '0';
+    content.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        popup.classList.add('hidden');
+        content.style.transition = '';
+        content.style.opacity = '';
+        content.style.transform = '';
+    }, 250);
+}
 
 // Function to change the text of the scam quiz popup based on if the user is correct or not
 function scamQuizAlert(correct, explanation) {
@@ -62,8 +99,47 @@ function nextRound() {
     // Check if the quiz is over
     if (currentRound >= totalRounds) {
         // Show the final result
-        alert('Quiz completed! Thank you for participating.');
-        // ADD LEADERBOARD FUNCTIONALITY HERE
+        clearInterval(timerInterval);
+        const timeTakenInSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+
+        // Prepare score data to send to server
+        const scoreData = {
+            score: score,
+            total: totalRounds,
+            timeTaken: timeTakenInSeconds,
+            game: "quiz"
+        };
+
+        if (window.isLoggedIn) {
+            fetch("/api/score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(scoreData)
+            })
+                .then(res => res.text())
+                .then(msg => {
+                    console.log("Score saved:", msg);
+                    document.body.classList.add('fade-out');
+                    setTimeout(() => {
+                        window.location.href = "/leaderboard?game=quiz";
+                    }, 1000);
+                })
+                .catch(err => {
+                    console.error("Score not saved:", err);
+                    document.body.classList.add('fade-out');
+                    setTimeout(() => {
+                        window.location.href = "/leaderboard?game=quiz";
+                    }, 1000);
+                });
+        } else {
+            console.log("Not logged in — score not saved.");
+            document.body.classList.add('fade-out');
+            setTimeout(() => {
+                window.location.href = "/leaderboard?game=quiz";
+            }, 1000);
+        }
+
+
         return;
     }
     // Update the progress bar
@@ -143,6 +219,9 @@ function startTimer(duration) {
 window.addEventListener('DOMContentLoaded', () => {
     // Initialize the progress bar
     progressBarFull = document.getElementById('progress-bar-full');
+
+    gameStartTime = Date.now(); // Track when quiz starts
+
     const timeLimit = 10 * 60 // 10 minutes
     startTimer(timeLimit);
 
