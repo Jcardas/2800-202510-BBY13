@@ -228,7 +228,8 @@ app.get("/leaderboard", async (req, res) => {
     res.render('leaderboard', {
       leaderboard,
       title: 'Leaderboard',
-      isLoggedIn: req.session.authenticated === true
+      isLoggedIn: req.session.authenticated === true,
+      extraStyles: "/css/leaderboard.css"
     });
   } catch (error) {
     console.error("Error fetching leaderboard data:", error);
