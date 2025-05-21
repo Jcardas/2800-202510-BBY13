@@ -202,8 +202,12 @@ app.get("/about", (req, res) => {
 });
 
 app.get("/leaderboard", async (req, res) => {
+
+  const gameFilter = req.query.game || "real-vs-ai";
+
   try {
     const leaderboard = await scoresCollection.aggregate([
+      { $match: { game: gameFilter } },
       { $sort: { score: -1, time: 1 } },
       { $limit: 6 },
       {
@@ -228,7 +232,7 @@ app.get("/leaderboard", async (req, res) => {
 
     res.render('leaderboard', {
       leaderboard,
-      title: 'Leaderboard',
+      title: gameFilter === "quiz" ? 'Have I been Scammed? Leaderboard' : 'Real vs AI Leaderboard',
       isLoggedIn: req.session.authenticated === true,
       extraStyles: "/css/leaderboard.css"
     });
@@ -713,8 +717,12 @@ app.post("/account/update", isAuthenticated, upload.single('profileImage'), asyn
 // Submit Score if user is authenticated
 app.post("/api/score", isAuthenticated, async (req, res) => {
   try {
-    const { score, total, timeTaken } = req.body;
+    const { score, total, timeTaken, game } = req.body;
     const user = await userCollection.findOne({ email: req.session.email });
+
+    if (!game || !["real-vs-ai", "quiz"].includes(game)) {
+      return res.status(400).send("Invalid game type.");
+    }
 
     //Format time
     const formattedTime = formatTime(Number(timeTaken));
@@ -724,6 +732,7 @@ app.post("/api/score", isAuthenticated, async (req, res) => {
       score,
       total,
       time: formattedTime,
+      game,
       timestamp: new Date()
     });
 
@@ -731,6 +740,7 @@ app.post("/api/score", isAuthenticated, async (req, res) => {
       userId: user._id,
       score,
       total,
+      game,
       time: formattedTime,
     });
 

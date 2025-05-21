@@ -142,7 +142,7 @@ function updateProgressBar() {
 // Function to submit the answer 
 async function submitAnswer() {
     if (!selectedImage) {
-        alert('Please select an image before submitting your answer.');
+        showNoAnswerPopup();
         return;
     }
 
@@ -191,6 +191,36 @@ function closeRoundPopup() {
         popup.style.transition = '';
         popup.style.opacity = '';
         popup.style.transform = '';
+    }, 250);
+}
+
+// Function to show the no answer popup with animation
+function showNoAnswerPopup() {
+    const popup = document.getElementById('no-answer-popup');
+    popup.classList.remove('hidden');
+
+    const content = popup.querySelector('div');
+    content.style.opacity = '0';
+    content.style.transform = 'scale(0.95)';
+    requestAnimationFrame(() => {
+        content.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        content.style.opacity = '1';
+        content.style.transform = 'scale(1)';
+    });
+}
+
+// Function to close the no answer popup
+function closeNoAnswerPopup() {
+    const popup = document.getElementById('no-answer-popup');
+    const content = popup.querySelector('div');
+    content.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    content.style.opacity = '0';
+    content.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        popup.classList.add('hidden');
+        content.style.transition = '';
+        content.style.opacity = '';
+        content.style.transform = '';
     }, 250);
 }
 
@@ -256,7 +286,8 @@ function nextRound() {
         const scoreData = {
             score: score,
             total: totalRounds,
-            timeTaken: timeTakenInSeconds
+            timeTaken: timeTakenInSeconds,
+            game: "real-vs-ai"
         };
 
         console.log("Game over! Your scored : " + score + " out of " + totalRounds + " in " + timeTakenInSeconds + " seconds.");
@@ -275,7 +306,7 @@ function nextRound() {
                     document.body.classList.add('fade-out');
                     setTimeout(() => {
                         window.location.href = "/leaderboard";
-                    }, 1000); 
+                    }, 1000);
                 })
                 .catch(err => {
                     console.error("Error submitting score:", err);
