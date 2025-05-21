@@ -283,9 +283,9 @@ app.get("/account", isAuthenticated, (req, res) => {
 app.post("/signup", async (req, res) => {
 
   // Get form data from the request body
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
+  const username = req.body.username.trim();
+  const email = req.body.email.trim();
+  const password = req.body.password.trim();
 
   // Store form data in session in case we need to redirect back
   req.session.formData = { username, email };
@@ -332,8 +332,8 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
 
   // Get form data from the request body
-  const email = req.body.email;
-  const password = req.body.password;
+  const email = req.body.email.trim();
+  const password = req.body.password.trim();
 
   // Validate form data using Joi
   // The schema requires email and password to be present
@@ -743,7 +743,7 @@ app.post("/account/update", isAuthenticated, upload.single('profileImage'), asyn
   // try to update the user's profile image and username
   try {
     // Get the username and profile image from the request body
-    const username = req.body.username;
+    const username = req.body.username.trim();
     const removeProfileImage = req.body.removeProfileImage === 'true';
     const profileImage = req.file;
 
