@@ -7,7 +7,7 @@
             <%- include("partials/sliding_bar") %>
 
                 <main class="container mx-auto mt-8 flex-grow ">
-                    <h1 class="text-black text-4xl font-bold text-left mb-12 ml-2">Admin</h1>
+                    <h1 class="text-black text-4xl font-bold text-left mb-12 ml-2">Real vs. AI Admin</h1>
                     <% if (message) { %>
                         <div id="toast-message" class="flex items-center p-4 mb-4 rounded-lg shadow 
                             text-sm font-medium 
@@ -35,7 +35,7 @@
                             <p class="text-xl text-center p-4">You can upload a new image for the ai vs. real image
                                 game.</p>
 
-                            <form action="/admin/upload" method="POST" enctype="multipart/form-data"
+                            <form action="/admin/real-vs-ai/upload" method="POST" enctype="multipart/form-data"
                                 class="flex flex-col items-center">
                                 <!-- File input -->
                                 <input id="imageInput" type="file" name="image" accept="image/*" class="mb-4"

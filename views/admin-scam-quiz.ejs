@@ -1,0 +1,73 @@
+<%- include("partials/header") %>
+    <!-- Navbar -->
+    <%- include("partials/navbar") %>
+        <%- include("partials/location_alert") %>
+            <!-- Accessibility Sliding Bar -->
+            <%- include("partials/sliding_bar") %>
+
+                <main class="container mx-auto mt-8 flex-grow">
+                    <h1 class="text-black text-4xl font-bold text-left mb-12 ml-2">Scam Quiz Admin</h1>
+
+                    <% if (message) { %>
+                        <div id="toast-message" class="flex items-center p-4 mb-4 rounded-lg shadow
+      text-sm font-medium
+      <%= message.includes('success')
+        ? 'bg-green-100 text-green-800 border border-green-300'
+        : 'bg-red-100 text-red-800 border border-red-300' %>">
+
+                            <span class="flex-grow">
+                                <%= message %>
+                            </span>
+
+                            <button onclick="document.getElementById('toast-message').remove()"
+                                class="ms-3 text-lg leading-none">&times;</button>
+                        </div>
+
+                        <script>
+                            setTimeout(() => {
+                                const toast = document.getElementById('toast-message');
+                                if (toast) toast.remove();
+                            }, 4000);
+                        </script>
+                        <% } %>
+
+                            <p class="text-xl text-center p-4">Use this form to add new scam quiz questions to the
+                                database.</p>
+
+                            <form action="/admin/scam-quiz/add" method="POST"
+                                class="flex flex-col items-center w-full max-w-2xl mx-auto">
+                                <!-- Question Text -->
+                                <input type="text" name="question" placeholder="Enter your scam question" required
+                                    class="w-full p-3 border border-gray-300 rounded mb-4" />
+
+                                <!-- Option Inputs -->
+                                <input type="text" name="options[]" placeholder="Option 1" required
+                                    class="w-full p-3 border border-gray-300 rounded mb-2" />
+                                <input type="text" name="options[]" placeholder="Option 2" required
+                                    class="w-full p-3 border border-gray-300 rounded mb-2" />
+                                <input type="text" name="options[]" placeholder="Option 3" required
+                                    class="w-full p-3 border border-gray-300 rounded mb-4" />
+
+                                <!-- Correct Option Index -->
+                                <select name="correctIndex" required
+                                    class="w-full p-3 border border-gray-300 rounded mb-4">
+                                    <option value="">Select the correct option</option>
+                                    <option value="0">Option 1</option>
+                                    <option value="1">Option 2</option>
+                                    <option value="2">Option 3</option>
+                                </select>
+
+                                <!-- Explanation -->
+                                <textarea name="explanation" rows="3" placeholder="Explain why it's correct" required
+                                    class="w-full p-3 border border-gray-300 rounded mb-4"></textarea>
+
+                                <button type="submit"
+                                    class="bg-blue-500 text-white mb-4 px-4 py-2 rounded">
+                                    Submit Question
+                                </button>
+                            </form>
+
+                </main>
+
+                <!-- Footer -->
+                <%- include("partials/footer") %>

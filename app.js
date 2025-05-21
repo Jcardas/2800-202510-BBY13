@@ -42,6 +42,7 @@ var { database } = require("./databaseConnection");
 const userCollection = database.db(MONGODB_DATABASE).collection("users");
 const imageCollection = database.db(MONGODB_DATABASE).collection("images");
 const scoresCollection = database.db(MONGODB_DATABASE).collection("scores");
+const scamQuizCollection = database.db(MONGODB_DATABASE).collection("questions");
 
 
 // Middleware
@@ -471,23 +472,41 @@ app.get("/api/hint/:description", async (req, res) => {
 
 // Admin Page
 // Only accessible to authenticated users with admin role
-// This page will be used to add new images to the database
+// This page will be used to access the admin panel
 app.get("/admin", isAuthenticated, isAdmin, (req, res) => {
+  res.render("admin-dashboard", {
+    title: "Admin Dashboard"
+  });
+});
+
+// Admin rout for real vs ai game to upload images
+app.get("/admin/real-vs-ai", isAuthenticated, isAdmin, (req, res) => {
   const message = req.session.message;
   delete req.session.message;
 
-  res.render('admin', {
-    title: 'Admin Dashboard',
+  res.render("admin-real-vs-ai", {
+    title: "Manage Real vs AI Game",
+    message
+  });
+});
+
+// Admin rout for scam quiz to uplaod questions
+app.get("/admin/scam-quiz", isAuthenticated, isAdmin, (req, res) => {
+  const message = req.session.message;
+  delete req.session.message;
+
+  res.render("admin-scam-quiz", {
+    title: "Manage Scam Quiz Questions",
     message
   });
 });
 
 // Admin Image Upload
-app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
+app.post("/admin/real-vs-ai/upload", isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       req.session.message = 'No image file uploaded.';
-      return res.redirect('/admin');
+      return res.redirect('/admin/real-vs-ai');
     }
 
     const type = req.body.type.toLowerCase();
@@ -498,7 +517,7 @@ app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), asyn
     const { error } = schema.validate({ type });
     if (error) {
       req.session.message = 'Invalid type: must be "ai" or "real"';
-      return res.redirect('/admin');
+      return res.redirect('/admin/real-vs-ai');
     }
 
     const image_uuid = uuid();
@@ -514,7 +533,7 @@ app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), asyn
 
     if (!result?.secure_url) {
       req.session.message = 'Cloudinary upload failed';
-      return res.redirect('/admin');
+      return res.redirect('/admin/real-vs-ai');
     }
 
     await imageCollection.insertOne({
@@ -524,14 +543,53 @@ app.post("/admin/upload", isAuthenticated, isAdmin, upload.single('image'), asyn
     });
 
     req.session.message = 'Image successfully uploaded!';
-    return res.redirect('/admin');
+    return res.redirect('/admin/real-vs-ai');
 
   } catch (err) {
     console.error(err);
     req.session.message = 'Error uploading image';
-    res.redirect('/admin');
+    res.redirect('/admin/real-vs-ai');
   }
 });
+
+// Admin Scam Quiz Upload
+// This route is used to add a new question to the scam quiz
+app.post("/admin/scam-quiz/add", isAuthenticated, isAdmin, async (req, res) => {
+  try {
+    const { question, options, correctIndex, explanation } = req.body;
+
+    const schema = Joi.object({
+      question: Joi.string().min(10).required(),
+      options: Joi.array().items(Joi.string().required()).length(3).required(),
+      correctIndex: Joi.number().valid(0, 1, 2).required(),
+      explanation: Joi.string().min(5).required()
+    });
+
+    const validation = schema.validate({ question, options, correctIndex: parseInt(correctIndex), explanation });
+
+    if (validation.error) {
+      req.session.message = 'Invalid form input: ' + validation.error.details[0].message;
+      return res.redirect("/admin/scam-quiz");
+    }
+
+    const newQuestion = {
+      question,
+      options,
+      correctIndex: parseInt(correctIndex),
+      explanation
+    };
+
+    await scamQuizCollection.insertOne(newQuestion);
+
+    req.session.message = "Question added successfully!";
+    res.redirect("/admin/scam-quiz");
+  } catch (error) {
+    console.error("Error adding scam quiz question:", error);
+    req.session.message = "Failed to add question.";
+    res.redirect("/admin/scam-quiz");
+  }
+});
+
 
 // takes the username and profileImage file from the form on the account page
 // and updates the user in the database, uploading the new image to cloudinary
