@@ -1,3 +1,6 @@
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('fade-in');
+});
 
 function closeLeaderboardPopup() {
     const popup = document.getElementById('leaderboard-popup');
@@ -13,6 +16,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const popup = document.getElementById('leaderboard-popup');
         popup.classList.remove('hidden');
+        popup.classList.add('fade-in');
+    
 
     const popupTitle = document.getElementById('leaderboard-popup-title');
     popupTitle.innerText = 'Sign up to play!';

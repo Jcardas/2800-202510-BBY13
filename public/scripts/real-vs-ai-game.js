@@ -271,16 +271,28 @@ function nextRound() {
                 .then(res => res.text())
                 .then(msg => {
                     console.log("Server response:", msg);
-                    window.location.href = "/leaderboard"; // Only redirect after score saved
+                    // Fade out effect before redirecting
+                    document.body.classList.add('fade-out');
+                    setTimeout(() => {
+                        window.location.href = "/leaderboard";
+                    }, 1000); 
                 })
                 .catch(err => {
                     console.error("Error submitting score:", err);
-                    window.location.href = "/leaderboard"; // Fallback redirect
+                    // Fade out effect before redirecting
+                    document.body.classList.add('fade-out');
+                    setTimeout(() => {
+                        window.location.href = "/leaderboard";
+                    }, 1000); // Match the transition duration
                 });
         } else {
             // If not logged in, still redirect after showing message
             console.log("User not logged in, score not saved.");
-            window.location.href = "/leaderboard";
+            // Fade out effect before redirecting
+            document.body.classList.add('fade-out');
+            setTimeout(() => {
+                window.location.href = "/leaderboard";
+            }, 400); // Match the transition duration
         }
     }
 }

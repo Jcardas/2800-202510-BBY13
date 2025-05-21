@@ -1,0 +1,12 @@
+.fade-in {
+  opacity: 1;
+  transition: opacity 2s ease;
+}
+.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+body {
+  opacity: 0;
+  background: #222;
+}
