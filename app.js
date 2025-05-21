@@ -100,6 +100,9 @@ function fromGamePage(req, res, next) {
   if (referer.includes("/real-vs-ai-game")) {
     return next(); // Allow access if request came from the game
   }
+  else if (referer.includes("/have-i-been-scammed")) {
+    return next(); // Allow access if request came from the scam quiz game
+  }
 
   // if not coming from game page, then this page does not exist
   return res.status(404).render("404", {
@@ -348,6 +351,39 @@ app.get("/api/image/:type", fromGamePage, async (req, res) => {
 
   // Send the image URL and description as JSON, and the description tag will be used to generate a hint
   res.json({ url: random.url, description: random.description });
+});
+
+// Route to get a scam quiz question from the database
+// If route is accessed from the game page (have-i-been-scammed.js), then it will return a random question
+// If not, then it will return a 404 error
+app.get("/api/scam-quiz", fromGamePage, async (req, res) => {
+  try {
+    const questions = await database.db(MONGODB_DATABASE)
+      .collection("questions")
+      .aggregate([{ $sample: { size: 1 } }])
+      .toArray();
+
+    if (!questions.length) {
+      return res.status(404).render("404", {
+        title: 'No questions found'
+      });
+    }
+
+    // Only send necessary fields to the client
+    const { _id, question, options, correctIndex, explanation } = questions[0];
+    res.json({
+      question: {
+        id: _id,
+        question,
+        options,
+        correctIndex,
+        explanation
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching scam quiz question:", error);
+    res.status(500).render("500", { title: 'Server Error' });
+  }
 });
 
 //Creating scammer joke with ChatGPT API
