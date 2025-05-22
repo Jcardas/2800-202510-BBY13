@@ -24,6 +24,7 @@ function removeImageFile() {
     profileImageInput.dataset.removed = "true"; // Mark as removed
 }
 
+// Show a confirmation popup when the user tries to save changes
 function confirmSave() {
     const popup = document.getElementById('confirm-popup');
     popup.classList.remove('hidden');
