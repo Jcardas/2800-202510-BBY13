@@ -185,11 +185,13 @@ app.get("/login", (req, res) => {
   res.render("login", {
     title: 'Log In',
     errorMessage: req.session.errorMessage || null,
-    email: req.session.email || null
+    email: req.session.email || null,
+    fieldError: req.session.fieldError || null
   });
   // Clear the error message after displaying it
   req.session.errorMessage = null;
   req.session.email = null;
+  req.session.fieldError = null;
 });
 
 // Load the real vs AI game page
@@ -349,6 +351,7 @@ app.post("/login", async (req, res) => {
   if (validation.error) {
     req.session.errorMessage = "Invalid input format";
     req.session.email = email; // Preserve the email they entered
+    req.session.fieldError = validation.error.details[0].path[0]; // Preserve the field that caused the error
     return res.redirect("/login");
   }
 
@@ -358,6 +361,7 @@ app.post("/login", async (req, res) => {
   if (!user) {
     req.session.errorMessage = "User not found";
     req.session.email = email; // Preserve the email they entered
+    req.session.fieldError = "email";
     return res.redirect("/login");
   }
 
@@ -367,6 +371,7 @@ app.post("/login", async (req, res) => {
   if (!match) {
     req.session.errorMessage = "Incorrect password";
     req.session.email = email; // Preserve the email they entered
+    req.session.fieldError = "password";
     return res.redirect("/login");
   }
 
