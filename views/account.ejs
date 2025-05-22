@@ -45,7 +45,7 @@ text-sm font-medium
 
                             <!-- Profile Photo Section -->
                             <h3 class="text-xl font-semibold mb-4 text-gray-700">Profile Photo</h3>
-                            <form onsubmit="postAccountChanges(); return false;" class="space-y-6">
+                            <form onsubmit="confirmSave(); return false;" class="space-y-6">
                                 <!-- Profile Photo Field -->
                                 <div class="flex items-start space-x-6">
                                     <!-- Profile Image -->
@@ -86,6 +86,8 @@ text-sm font-medium
                                 </button>
                             </form>
                 </div>
+                <!-- Confirmation Popup -->
+                <%- include("partials/confirmation-popup") %>
             </main>
 
 

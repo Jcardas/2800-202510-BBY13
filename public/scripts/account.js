@@ -24,6 +24,22 @@ function removeImageFile() {
     profileImageInput.dataset.removed = "true"; // Mark as removed
 }
 
+function confirmSave() {
+    const popup = document.getElementById('confirm-popup');
+    popup.classList.remove('hidden');
+
+    //Handle confirmation
+    document.getElementById('confirm-yes').onclick = () => {
+        popup.classList.add('hidden');
+        postAccountChanges(); // Proceed to save changes
+    };
+
+    //Handle cancellation
+    document.getElementById('confirm-no').onclick = () => {
+        popup.classList.add('hidden');
+    };
+}
+
 // Send changes to the server when the user clicks the save button
 function postAccountChanges() {
     const formData = new FormData();
