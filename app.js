@@ -253,7 +253,8 @@ app.get("/leaderboard", async (req, res) => {
       leaderboard,
       title: gameFilter === "quiz" ? 'Have I been Scammed? Leaderboard' : 'Real vs AI Leaderboard',
       isLoggedIn: req.session.authenticated === true,
-      extraStyles: "/css/leaderboard.css"
+      extraStyles: "/css/leaderboard.css",
+      gameFilter: gameFilter
     });
   } catch (error) {
     console.error("Error fetching leaderboard data:", error);

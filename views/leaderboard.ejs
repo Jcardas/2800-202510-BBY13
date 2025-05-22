@@ -25,19 +25,19 @@
                     <!-- Game Selection -->
                     <div class="ml-4 mt-2">
                         <a href="/leaderboard?game=real-vs-ai" class="inline-block bg-gradient-to-r from-lime-400 to-lime-300 
-                        text-white text-sm font-semibold py-1 px-3 
-                            rounded-full shadow hover:shadow-lg transition-shadow mr-2">
+                            text-white text-sm font-semibold py-1 px-3 
+                            rounded-full shadow hover:shadow-lg transition-shadow mr-2
+                            <%= gameFilter === 'real-vs-ai' ? 'ring-4 ring-lime-600' : '' %>">
                             Real vs AI
                         </a>
 
                         <a href="/leaderboard?game=quiz" class="inline-block bg-gradient-to-r from-purple-500 to-purple-400 
-                        text-white text-sm font-semibold py-1 px-3 
-                            rounded-full shadow hover:shadow-lg transition-shadow">
+                            text-white text-sm font-semibold py-1 px-3 
+                            rounded-full shadow hover:shadow-lg transition-shadow
+                            <%= gameFilter === 'quiz' ? 'ring-4 ring-purple-700' : '' %>">
                             Scam Quiz
                         </a>
-
                     </div>
-
 
                     <!-- Leaderboard Table -->
                     <div class="mt-6 mx-auto max-w-screen-md mb-8">
