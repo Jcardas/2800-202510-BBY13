@@ -31,6 +31,7 @@ We're BBY-13, a term 2 BCIT projects group:
 - Tailwind CSS
 - Google Material Icon (icon library)
 - MongoDB
+- Cloudinary (Store images)
 - OpenAI Sora (Ai Image Generation)
 - Adobe Firefly (Ai Image Generation)
 
