@@ -170,6 +170,12 @@ app.get("/games", (req, res) => {
 
 // Load signup and page with error message if it exists
 app.get("/signup", (req, res) => {
+
+  // Check if the user is already logged in
+  if (req.session.authenticated) {
+    return res.redirect("/");
+  }
+
   res.render("signup", {
     title: 'Sign Up',
     errorMessage: req.session.errorMessage || null,
@@ -182,6 +188,12 @@ app.get("/signup", (req, res) => {
 
 // Load login page with error message if it exists
 app.get("/login", (req, res) => {
+
+  // Check if the user is already logged in
+  if (req.session.authenticated) {
+    return res.redirect("/");
+  }
+
   res.render("login", {
     title: 'Log In',
     errorMessage: req.session.errorMessage || null,
