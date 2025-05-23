@@ -48,5 +48,4 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Font size reset to default (16px)");
         });
     }
-
 });

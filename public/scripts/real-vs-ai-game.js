@@ -396,7 +396,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     progressBarFull.style.width = '0%';
 });
 
-// Sctript to have AI generate a hint based on the images description
+// Script to have AI generate a hint based on the images description
 // This function will be called when the user clicks the hint button
 // Cache for hints per round
 let roundHintsCache = {};
