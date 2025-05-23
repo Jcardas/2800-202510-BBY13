@@ -11,14 +11,13 @@
             <main class="container mx-auto mt-8 flex-grow px-4">
                 <h1 class="text-3xl font-bold mb-6">Manage Information Pages</h1>
 
-                <!-- Message Display Area -->
+                <!-- Updates the message based on successful / unsuccessful changes made to the information page -->
                 <% if (message) { %>
                     <div id="toast-message" class="flex items-center p-4 mb-4 rounded-lg shadow 
-      text-sm font-medium 
-      <%= message.type === 'success' 
-        ? 'bg-green-100 text-green-800 border border-green-300' 
-        : 'bg-red-100 text-red-800 border border-red-300' %>">
-
+                                                    text-sm font-medium 
+                                                    <%= message.type === 'success' 
+                                                        ? 'bg-green-100 text-green-800 border border-green-300' 
+                                                        : 'bg-red-100 text-red-800 border border-red-300' %>">
                         <span class="flex-grow">
                             <%= message.text %>
                         </span>

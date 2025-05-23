@@ -7,6 +7,8 @@
 
             <!-- Body -->
             <main class="container mx-auto mt-8 flex-grow px-4">
+
+                <!-- Dynamically insert information page content -->
                 <% if (content) { %>
                     <article class="max-w-4xl mx-auto">
                         <h1 class="text-3xl font-bold mb-6">
@@ -30,6 +32,8 @@
                                     </p>
                                     <% } %>
                     </article>
+
+                    <!-- Otherwise, display an error message and allow user to return to previous page -->
                     <% } else { %>
                         <div class="text-center py-12">
                             <h2 class="text-2xl font-semibold mb-4">Content Not Found</h2>

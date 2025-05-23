@@ -8,13 +8,14 @@
 
                 <main class="container mx-auto mt-8 flex-grow ">
                     <h1 class="text-black text-4xl font-bold text-left mb-12 ml-2">Real vs. AI Admin</h1>
+
+                    <!-- Updates the message based on successful / unsuccessful image uploads -->
                     <% if (message) { %>
                         <div id="toast-message" class="flex items-center p-4 mb-4 rounded-lg shadow 
-                            text-sm font-medium 
-                            <%= message.includes('success') 
-                            ? 'bg-green-100 text-green-800 border border-green-300' 
-                            : 'bg-red-100 text-red-800 border border-red-300' %>">
-
+                                                        text-sm font-medium 
+                                                        <%= message.includes('success') 
+                                                        ? 'bg-green-100 text-green-800 border border-green-300' 
+                                                        : 'bg-red-100 text-red-800 border border-red-300' %>">
                             <span class="flex-grow">
                                 <%= message %>
                             </span>
@@ -27,7 +28,7 @@
                             setTimeout(() => {
                                 const toast = document.getElementById('toast-message');
                                 if (toast) toast.remove();
-                            }, 4000); // 4000ms = 4 seconds
+                            }, 4000); // Disappear after 4 seconds
                         </script>
                         <% } %>
 
@@ -35,34 +36,35 @@
                             <p class="text-xl text-center p-4">You can upload a new image for the ai vs. real image
                                 game.</p>
 
+                            <!-- This form handles new image inputs -->
                             <form action="/admin/real-vs-ai/upload" method="POST" enctype="multipart/form-data"
                                 class="flex flex-col items-center">
-                                <!-- File input -->
-                                <input id="imageInput" type="file" name="image" accept="image/*" class="mb-4"
-                                    required>
 
-                                <!-- Preview Image -->
+                                <!-- Image input -->
+                                <input id="imageInput" type="file" name="image" accept="image/*" class="mb-4" required>
+
+                                <!-- Preview Image (displays uploaded image) -->
                                 <img id="previewImage" src="#" alt="Image Preview"
                                     class="hidden mb-4 rounded shadow-md max-w-xs border">
 
-                                <!-- Dropdown for type -->
+                                <!-- Dropdown for type (Real or AI) -->
                                 <select name="type" class="mb-4 p-2 border border-gray-300 rounded" required>
                                     <option value="">Select image type</option>
                                     <option value="AI">AI</option>
                                     <option value="Real">Real</option>
                                 </select>
 
-                                <!-- Description of picture -->
+                                <!-- Description of picture (This helps the Hint system generate hints based on the desc of the photo)-->
                                 <textarea name="description" rows="4" class="mb-4 p-2 border border-gray-300 rounded"
                                     placeholder="Description of the picture" required></textarea>
 
-                                <!-- Submit button -->
+                                <!-- Submits the form, with image and desc. -->
                                 <button type="submit"
                                     class="bg-blue-500 text-white mb-4 px-4 py-2 rounded">Upload</button>
                             </form>
-
                 </main>
 
+                <!-- Client side script to show the image preview when uploaded -->
                 <script>
                     const imageInput = document.getElementById("imageInput");
                     const previewImage = document.getElementById("previewImage");

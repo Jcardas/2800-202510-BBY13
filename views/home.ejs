@@ -7,7 +7,8 @@
             <%- include("partials/sliding_bar") %>
 
                 <main class="container mx-auto mt-8 flex-grow">
-                    <!-- Page Title -->
+
+                    <!-- Page Title ( Homepage ) -->
                     <h1 class="text-black text-4xl font-bold text-left ml-2">Home</h1>
                     <div class="container mx-auto px-6 flex relative py-8">
                         <div class="sm:w-2/3 lg:w-2/5 flex flex-col relative z-20">
@@ -19,6 +20,7 @@
                                 engaging, and educational, helping you to navigate the world of AI with confidence.
                             </p>
 
+                            <!-- Hero Buttons -->
                             <div class="flex mt-8 mb-12 gap-4">
                                 <a href="/games" class="bg-gradient-to-r 
                                 from-lime-400 to-lime-300 text-white 
@@ -42,6 +44,7 @@
                                 </a>
                             </div>
 
+                            <!-- Leaderboards Section -->
                             <h2 class="text-xl font-bold mb-4">Leaderboards
                             </h2>
                             <p class=" sm:text-base text-black">
@@ -49,6 +52,7 @@
                                 compete for the top spot and earn bragging rights among your friends and family!
                             </p>
 
+                            <!-- Will display sign up / login buttons if the user isn't logged in -->
                             <div class="flex mt-8 gap-4">
                                 <% if (!user) { %>
                                     <a href="/signup" class="bg-gradient-to-r 
@@ -70,6 +74,8 @@
                                     transition-shadow">
                                         Log In
                                     </a>
+
+                                    <!-- Otherwise will provide a link to the leaderboards -->
                                     <% } else { %>
                                         <a href="/leaderboard" class="bg-gradient-to-r 
                                     from-green-400 to-green-300 text-white 
@@ -84,6 +90,7 @@
                                         <% } %>
                             </div>
 
+                            <!-- Fun AI generated joke section -->
                             <h2 class="text-xl font-bold mt-12 mb-4">More fun
                             </h2>
                             <p id="joke-output" class="joke-output sm:text-base text-black ">
