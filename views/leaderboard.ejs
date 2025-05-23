@@ -15,11 +15,29 @@
                 <script src="/scripts/leaderboard.js"></script>
 
                 <main class="container mx-auto mt-8 flex-grow">
+
                     <!-- Page Title -->
                     <div class="flex justify-between items-center">
                         <h1 class="text-green-400 text-4xl font-bold text-left ml-4">
-                            Real VS Ai Leaderboard
+                            <%= title %>
                         </h1>
+                    </div>
+
+                    <!-- Game Selection Buttons (Choose between which leaderboard) -->
+                    <div class="ml-4 mt-2">
+                        <a href="/leaderboard?game=real-vs-ai" class="inline-block bg-gradient-to-r from-lime-400 to-lime-300 
+                            text-white text-sm font-semibold py-1 px-3 
+                            rounded-full shadow hover:shadow-lg transition-shadow mr-2
+                            <%= gameFilter === 'real-vs-ai' ? 'ring-4 ring-lime-600' : '' %>">
+                            Real vs AI
+                        </a>
+
+                        <a href="/leaderboard?game=quiz" class="inline-block bg-gradient-to-r from-purple-500 to-purple-400 
+                            text-white text-sm font-semibold py-1 px-3 
+                            rounded-full shadow hover:shadow-lg transition-shadow
+                            <%= gameFilter === 'quiz' ? 'ring-4 ring-purple-700' : '' %>">
+                            Scam Quiz
+                        </a>
                     </div>
 
                     <!-- Leaderboard Table -->
@@ -43,7 +61,7 @@
                                             <%= index + 1 %>
                                         </div>
                                         <img src="<%= entry.profileImageUrl || '/icons/account_circle_black.svg' %>"
-                                            alt="Profile" class="w-10 h-10 rounded-full object-cover" />
+                                            alt="Profile" class="w-10 h-10 rounded-full object-cover">
 
                                         <div class="text-lg font-semibold">
                                             <%= entry.username %>
@@ -58,5 +76,5 @@
                     </div>
                 </main>
 
-                <!-- Footer -->
-                <%- include("partials/footer") %>
+<!-- Footer -->
+<%- include("partials/footer") %>

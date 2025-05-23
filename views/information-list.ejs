@@ -2,25 +2,36 @@
     <!-- Navbar -->
     <%- include("partials/navbar") %>
 
-    <!-- Body -->
-    <main class="container mx-auto mt-8 flex-grow px-4">
-        <h1 class="text-3xl font-bold mb-8 text-purple-500">Information Hub</h1>
-        
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <% pages.forEach(page => { %>
-                <a href="/information/<%= page.slug %>" class="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
-                    <% if (page.imageUrl) { %>
-                        <img src="<%= page.imageUrl %>" alt="<%= page.title %>" class="w-full h-48 object-cover">
-                    <% } %>
-                    <div class="p-6">
-                        <h2 class="text-xl font-semibold mb-2"><%= page.title %></h2>
-                        <p class="text-gray-600 mb-4"><%= page.description %></p>
-                        <span class="text-blue-600 hover:underline">Read more →</span>
-                    </div>
-                </a>
-            <% }); %>
-        </div>
-    </main>
+        <!-- Accessibility Sliding Bar -->
+        <%- include("partials/sliding_bar") %>
 
-<!-- Footer -->
-<%- include("partials/footer") %>
+            <!-- Body -->
+            <main class="container mx-auto mt-8 flex-grow px-4">
+                <h1 class="text-3xl font-bold mb-8 text-purple-500">Information Hub</h1>
+
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+                    <!-- Dynamically inserts the info pages with short desc -->
+                    <% pages.forEach(page=> { %>
+                        <a href="/information/<%= page.slug %>"
+                            class="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+                            <% if (page.imageUrl) { %>
+                                <img src="<%= page.imageUrl %>" alt="<%= page.title %>"
+                                    class="w-full h-48 object-cover">
+                                <% } %>
+                                    <div class="p-6">
+                                        <h2 class="text-xl font-semibold mb-2">
+                                            <%= page.title %>
+                                        </h2>
+                                        <p class="text-gray-600 mb-4">
+                                            <%= page.description %>
+                                        </p>
+                                        <span class="text-blue-600 hover:underline">Read more →</span>
+                                    </div>
+                        </a>
+                        <% }); %>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <%- include("partials/footer") %>

@@ -1,5 +1,8 @@
+// This script handles the location alert functionality, including fetching the user's location and displaying a message.
+
 console.log("Location alert script loaded.");
 
+// Function to create a scrolling message
 fetch("https://ipapi.co/json/")
     .then(response => response.json())
     .then(locationData => {
@@ -8,6 +11,7 @@ fetch("https://ipapi.co/json/")
         const lat = locationData.latitude;
         const lon = locationData.longitude;
 
+        // Fetch weather data
         fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
             .then(response => response.json())
             .then(weatherData => {

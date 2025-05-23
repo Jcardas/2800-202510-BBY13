@@ -2,34 +2,47 @@
     <!-- Navbar -->
     <%- include("partials/navbar") %>
 
-    <!-- Body -->
-    <main class="container mx-auto mt-8 flex-grow px-4">
-        <% if (content) { %>
-            <article class="max-w-4xl mx-auto">
-                <h1 class="text-3xl font-bold mb-6"><%= content.title %></h1>
-                
-                <% if (content.imageUrl) { %>
-                    <div class="mb-6">
-                        <img src="<%= content.imageUrl %>" alt="<%= content.title %>" class="rounded-lg shadow-md w-full max-h-96 object-cover">
-                    </div>
-                <% } %>
-                
-                <div class="prose max-w-none">
-                    <%- content.body %>
-                </div>
-                
-                <% if (content.updatedAt) { %>
-                    <p class="text-sm text-gray-500 mt-4">Last updated: <%= new Date(content.updatedAt).toLocaleDateString() %></p>
-                <% } %>
-            </article>
-        <% } else { %>
-            <div class="text-center py-12">
-                <h2 class="text-2xl font-semibold mb-4">Content Not Found</h2>
-                <p class="text-gray-600">The requested information page could not be found.</p>
-                <a href="/information" class="mt-4 inline-block text-blue-600 hover:underline">Back to Information Hub</a>
-            </div>
-        <% } %>
-    </main>
+        <!-- Accessibility Sliding Bar -->
+        <%- include("partials/sliding_bar") %>
 
-<!-- Footer -->
-<%- include("partials/footer") %>
+            <!-- Body -->
+            <main class="container mx-auto mt-8 flex-grow px-4">
+
+                <!-- Dynamically insert information page content -->
+                <% if (content) { %>
+                    <article class="max-w-4xl mx-auto">
+                        <h1 class="text-3xl font-bold mb-6">
+                            <%= content.title %>
+                        </h1>
+
+                        <% if (content.imageUrl) { %>
+                            <div class="mb-6">
+                                <img src="<%= content.imageUrl %>" alt="<%= content.title %>"
+                                    class="rounded-lg shadow-md w-full max-h-96 object-cover">
+                            </div>
+                            <% } %>
+
+                                <div class="prose max-w-none">
+                                    <%- content.body %>
+                                </div>
+
+                                <% if (content.updatedAt) { %>
+                                    <p class="text-sm text-gray-500 mt-4">Last updated: <%= new
+                                            Date(content.updatedAt).toLocaleDateString() %>
+                                    </p>
+                                    <% } %>
+                    </article>
+
+                    <!-- Otherwise, display an error message and allow user to return to previous page -->
+                    <% } else { %>
+                        <div class="text-center py-12">
+                            <h2 class="text-2xl font-semibold mb-4">Content Not Found</h2>
+                            <p class="text-gray-600">The requested information page could not be found.</p>
+                            <a href="/information" class="mt-4 inline-block text-blue-600 hover:underline">Back to
+                                Information Hub</a>
+                        </div>
+                        <% } %>
+            </main>
+
+            <!-- Footer -->
+            <%- include("partials/footer") %>

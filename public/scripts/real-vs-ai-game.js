@@ -1,9 +1,10 @@
-// TODO: Keep track of score after each round
+// This script handles the real vs ai game functionality, including image loading, selection, and score tracking.
 
 // Function to provide hints (For now, hints will be linked to the round)
 const totalRounds = 10;
 let currentRound = 0;
 
+// Initialize the next images to be preloaded
 let nextRealImageObj = '';
 let nextAiImageObj = '';
 
@@ -13,6 +14,7 @@ let score = 0; // Initialize score variable
 let realImageObj = '';
 let aiImageObj = '';
 
+// This will be used to store the left and right images
 let leftImage = null;
 let rightImage = null;
 
@@ -21,6 +23,7 @@ let rightImage = null;
 // depending on which one is the real image 
 let realImage = null;
 
+// This will be used to store the selected image
 let selectedImage = null;
 let progressBarFull;
 
@@ -142,7 +145,7 @@ function updateProgressBar() {
 // Function to submit the answer 
 async function submitAnswer() {
     if (!selectedImage) {
-        alert('Please select an image before submitting your answer.');
+        showNoAnswerPopup();
         return;
     }
 
@@ -191,6 +194,36 @@ function closeRoundPopup() {
         popup.style.transition = '';
         popup.style.opacity = '';
         popup.style.transform = '';
+    }, 250);
+}
+
+// Function to show the no answer popup with animation
+function showNoAnswerPopup() {
+    const popup = document.getElementById('no-answer-popup');
+    popup.classList.remove('hidden');
+
+    const content = popup.querySelector('div');
+    content.style.opacity = '0';
+    content.style.transform = 'scale(0.95)';
+    requestAnimationFrame(() => {
+        content.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        content.style.opacity = '1';
+        content.style.transform = 'scale(1)';
+    });
+}
+
+// Function to close the no answer popup
+function closeNoAnswerPopup() {
+    const popup = document.getElementById('no-answer-popup');
+    const content = popup.querySelector('div');
+    content.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    content.style.opacity = '0';
+    content.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        popup.classList.add('hidden');
+        content.style.transition = '';
+        content.style.opacity = '';
+        content.style.transform = '';
     }, 250);
 }
 
@@ -256,7 +289,8 @@ function nextRound() {
         const scoreData = {
             score: score,
             total: totalRounds,
-            timeTaken: timeTakenInSeconds
+            timeTaken: timeTakenInSeconds,
+            game: "real-vs-ai"
         };
 
         console.log("Game over! Your scored : " + score + " out of " + totalRounds + " in " + timeTakenInSeconds + " seconds.");
@@ -271,16 +305,28 @@ function nextRound() {
                 .then(res => res.text())
                 .then(msg => {
                     console.log("Server response:", msg);
-                    window.location.href = "/leaderboard"; // Only redirect after score saved
+                    // Fade out effect before redirecting
+                    document.body.classList.add('fade-out');
+                    setTimeout(() => {
+                        window.location.href = "/leaderboard";
+                    }, 1000);
                 })
                 .catch(err => {
                     console.error("Error submitting score:", err);
-                    window.location.href = "/leaderboard"; // Fallback redirect
+                    // Fade out effect before redirecting
+                    document.body.classList.add('fade-out');
+                    setTimeout(() => {
+                        window.location.href = "/leaderboard";
+                    }, 1000); // Match the transition duration
                 });
         } else {
             // If not logged in, still redirect after showing message
             console.log("User not logged in, score not saved.");
-            window.location.href = "/leaderboard";
+            // Fade out effect before redirecting
+            document.body.classList.add('fade-out');
+            setTimeout(() => {
+                window.location.href = "/leaderboard";
+            }, 400); // Match the transition duration
         }
     }
 }
@@ -350,7 +396,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     progressBarFull.style.width = '0%';
 });
 
-// Sctript to have AI generate a hint based on the images description
+// Script to have AI generate a hint based on the images description
 // This function will be called when the user clicks the hint button
 // Cache for hints per round
 let roundHintsCache = {};

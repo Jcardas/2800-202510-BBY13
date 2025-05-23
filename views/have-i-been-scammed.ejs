@@ -1,0 +1,92 @@
+<%- include("partials/header") %>
+  <!-- Navbar -->
+  <%- include("partials/navbar") %>
+
+    <!-- Accessibility Sliding Bar -->
+    <%- include("partials/sliding_bar") %>
+
+      <!-- Round Alert Popup -->
+      <%- include("partials/games/have-i-been-scammed-popup") %>
+
+        <!-- No Answer Selected Popup -->
+        <%- include("partials/games/no-answer-popup") %>
+
+
+          <script>
+            window.isLoggedIn = <%= isLoggedIn ? 'true' : 'false' %>;
+            console.log("isLoggedIn from EJS:", window.isLoggedIn);
+          </script>
+          <script src="/scripts/have-i-been-scammed.js"></script>
+
+
+          <main class="container mx-auto mt-8 flex-grow mb-12">
+
+            <!-- Progress bar -->
+            <div id="progress-bar" class="w-3/4 bg-grary-200 rounded-full h-8 mb-4 mx-auto relative">
+
+              <!-- Background Bar-->
+              <div class="absolute inset-0 bg-gray-200 rounded-full"></div>
+
+              <!-- Purple Progress Bar -->
+              <div id="progress-bar-full"
+                class="bg-gradient-to-r from-purple-400 to-purple-300 rounded-full h-8 absolute top-0 left-0"
+                style="width: 0%">
+              </div>
+            </div>
+
+            <div class="w-3/4 mx-auto flex justify-between items-center mb-4">
+
+              <!-- Score -->
+              <p id="progress-text" class="text-xl text-gray-600 font-bold">
+                Round 1/10
+              </p>
+
+              <!-- Timer-->
+              <p id="timer" class="text-xl font-bold text-500">10:00</p>
+            </div>
+
+            <div class="flex justify-center md:gap-4 sm:gap-2 mb-8">
+
+              <!-- Game Content -->
+              <div class="w-full max-w-xl bg-white rounded-lg shadow-md p-6 flex flex-col ">
+                <h2 class="text-center text-2xl font-bold text-gray-800 mb-4">
+                  Is this a scam?
+                </h2>
+                <p id="question-text" class="text-lg text-gray-700 mb-6">
+                  <!-- Scam question will be inserted here -->
+                </p>
+
+                <!-- Answers, to be dynamically inserted from js -->
+                <div id="quiz-answers" class="flex flex-col gap-6">
+
+                  <!-- Template -->
+                  <!-- <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="quiz-answer" value="template" class="form-radio text-purple-500 mr-2">
+                        <span class="text-lg font-medium text-gray-700">Template</span>
+                    </label> -->
+
+                  <!-- Buttons go here -->
+
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Instructions for the user -->
+            <div class="flex justify-center mb-6">
+              <h2 class="text-center text-xl font-bold text-gray-800">
+                Select the correct action to take
+              </h2>
+            </div>
+
+            <!-- Submit button -->
+            <div class="flex justify-center mb-4">
+              <button id="submit-button"
+                class="bg-gradient-to-r from-purple-400 to-purple-300 text-white font-bold py-2 px-4 rounded shadow hover:shadow-lg transition-shadow active:scale-95">
+                Submit Answer
+              </button>
+            </div>
+          </main>
+
+          <!-- Footer -->
+          <%- include("partials/footer") %>
