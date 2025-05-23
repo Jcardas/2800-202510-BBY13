@@ -79,13 +79,13 @@
                                             <img id="previewImg" class="w-full h-full object-cover" src=""
                                                 alt="Preview">
                                         </div>
-                                        <label for="imageUpload" class="cursor-pointer">
-                                            <div class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
-                                                <span class="text-sm font-medium">Choose Image</span>
-                                                <input type="file" id="imageUpload" name="image" accept="image/*"
-                                                    class="hidden">
-                                            </div>
-                                        </label>
+                                        <div
+                                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition cursor-pointer">
+                                            <label for="imageUpload" class="text-sm font-medium cursor-pointer">Choose
+                                                Image</label>
+                                            <input type="file" id="imageUpload" name="image" accept="image/*"
+                                                class="hidden">
+                                        </div>
                                     </div>
                                 </div>
 
@@ -126,8 +126,8 @@
                                         </button>
                                     </div>
                                     <div id="editor" contenteditable="true"
-                                        class="bg-gray-50 border border-t-0 border-gray-300 text-gray-900 text-sm rounded-b-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 min-h-[200px]"
-                                        placeholder="Start typing your content here..."></div>
+                                        class="bg-gray-50 border border-t-0 border-gray-300 text-gray-900 text-sm rounded-b-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 min-h-[200px]">
+                                    </div>
                                     <textarea id="body" name="body" class="hidden" required></textarea>
                                     <div id="contentError" class="hidden mt-1 text-sm text-red-600">Please add some
                                         content

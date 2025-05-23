@@ -78,13 +78,13 @@
                                             <img id="previewImg" class="w-full h-full object-cover"
                                                 src="<%= page.imageUrl || '' %>" alt="Preview">
                                         </div>
-                                        <label for="imageUpload" class="cursor-pointer">
-                                            <div class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
+                                        <div class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition cursor-pointer">
+                                            <label for="imageUpload" class="cursor-pointer m-0">
                                                 <span class="text-sm font-medium">Choose Image</span>
                                                 <input type="file" id="imageUpload" name="image" accept="image/*"
                                                     class="hidden">
-                                            </div>
-                                        </label>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 

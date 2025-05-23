@@ -12,21 +12,22 @@
         <li><a href="/information"
             class="hover:text-purple-400 transition-colors duration-200 font-medium">Information</a></li>
         <li><a href="/about" class="hover:text-gray-600 transition-colors duration-200 font-medium">About</a></li>
-        <div class="flex items-center space-x-4">
-          <% if (user) { %>
+        <li>
+          <div class="flex items-center space-x-4">
+            <% if (user) { %>
 
-            <% if (user.role==="admin" ) { %>
-              <a href="/admin" class="hover:text-gray-600 transition-colors duration-200 font-medium">Admin
-                Dashboard</a>
-              <% } %>
-                <!-- Logged in state -->
-                <a href="/account" class="flex items-center">
-                  <span class="md:inline mr-2">
-                    <img src="<%= user.profileImageUrl %>" alt="Account"
-                      class="w-8 h-8 rounded-full object-cover hover:opacity-60 transition-opacity duration-200">
-                  </span>
-                </a>
-                <a href="/logout" class="hidden md:block bg-gray-400
+              <% if (user.role==="admin" ) { %>
+                <a href="/admin" class="hover:text-gray-600 transition-colors duration-200 font-medium">Admin
+                  Dashboard</a>
+                <% } %>
+                  <!-- Logged in state -->
+                  <a href="/account" class="flex items-center">
+                    <span class="md:inline mr-2">
+                      <img src="<%= user.profileImageUrl %>" alt="Account"
+                        class="w-8 h-8 rounded-full object-cover hover:opacity-60 transition-opacity duration-200">
+                    </span>
+                  </a>
+                  <a href="/logout" class="hidden md:block bg-gray-400
                   text-white 
                   font-bold
                   px-4 py-2 
@@ -36,10 +37,10 @@
                   hover:bg-gray-500
                   transition-shadow
                   hidden">Logout</a>
-                <% } else { %>
-                  <!-- Logged out state -->
-                  <div class="flex items-center space-x-4">
-                    <a href="/login" class="bg-gray-400
+                  <% } else { %>
+                    <!-- Logged out state -->
+                    <div class="flex items-center space-x-4">
+                      <a href="/login" class="bg-gray-400
                   text-white 
                   font-bold
                   px-4 py-2 
@@ -49,8 +50,8 @@
                   hover:bg-gray-500
                   transition-shadow
                   hidden">Login
-                    </a>
-                    <a href="/signup" class="bg-gradient-to-r 
+                      </a>
+                      <a href="/signup" class="bg-gradient-to-r 
                   from-blue-400 
                   to-blue-300 
                   text-white 
@@ -62,10 +63,12 @@
                   hover:from-blue-500
                   hover:to-blue-400 
                   transition-shadow">
-                      Sign Up
-                    </a>
-                  </div>
-                  <% } %>
+                        Sign Up
+                      </a>
+                    </div>
+                    <% } %>
+          </div>
+        </li>
       </ul>
     </nav>
 
@@ -73,7 +76,7 @@
     <div class="flex items-center space-x-4 md:hidden">
       <button id="mobile-menu-button" class="focus:outline-none">
         <img src="/icons/menu_black.svg" alt="Menu"
-          class="w-10 h-10 inline-block hover:opacity-60 transition-opacity duration-200" />
+          class="w-10 h-10 inline-block hover:opacity-60 transition-opacity duration-200">
       </button>
     </div>
   </div>
@@ -87,7 +90,7 @@
     <div class="flex justify-end p-4">
       <button id="close-menu-button" class="focus:outline-none">
         <img src="/icons/close_black.svg" alt="Close"
-          class="w-6 h-6 inline-block hover:opacity-60 transition-opacity duration-200" />
+          class="w-6 h-6 inline-block hover:opacity-60 transition-opacity duration-200">
       </button>
     </div>
 
@@ -116,29 +119,32 @@
             </a>
           </li>
           <% } %>
-            <div class="space-y-4">
-              <% if (user) { %>
-                <!-- Logged in state -->
-                <a href="/account" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
-                  <span class="md:inline mr-2">Account</span>
-                  <img src="/icons/account_circle_black.svg" alt="Account"
-                    class="w-8 h-8 hover:opacity-60 transition-opacity duration-200">
-                </a>
-                <a href="/logout"
-                  class="flex items-center  py-3 px-4 text-white bg-gray-400 hover:bg-gray-500 rounded text-lg">Logout</a>
-                <% } else { %>
-                  <!-- Logged out state - vertical buttons -->
-                  <div class="flex flex-col space-y-4">
-                    <a href="/login"
-                      class="flex items-center py-3 px-4 text-white bg-gray-400 hover:bg-gray-500 rounded text-lg">
-                      Login
-                    </a>
-                    <a href="/signup"
-                      class="flex items-center py-3 px-4 text-white bg-blue-400 hover:bg-blue-500 rounded text-lg">
-                      Sign Up
-                    </a>
-                  </div>
-                  <% } %>
+            <li>
+              <div class="space-y-4">
+                <% if (user) { %>
+                  <!-- Logged in state -->
+                  <a href="/account" class="flex items-center py-3 px-4 hover:bg-gray-100 rounded text-lg">
+                    <span class="md:inline mr-2">Account</span>
+                    <img src="/icons/account_circle_black.svg" alt="Account"
+                      class="w-8 h-8 hover:opacity-60 transition-opacity duration-200">
+                  </a>
+                  <a href="/logout"
+                    class="flex items-center  py-3 px-4 text-white bg-gray-400 hover:bg-gray-500 rounded text-lg">Logout</a>
+                  <% } else { %>
+                    <!-- Logged out state - vertical buttons -->
+                    <div class="flex flex-col space-y-4">
+                      <a href="/login"
+                        class="flex items-center py-3 px-4 text-white bg-gray-400 hover:bg-gray-500 rounded text-lg">
+                        Login
+                      </a>
+                      <a href="/signup"
+                        class="flex items-center py-3 px-4 text-white bg-blue-400 hover:bg-blue-500 rounded text-lg">
+                        Sign Up
+                      </a>
+                    </div>
+                    <% } %>
+              </div>
+            </li>
       </ul>
     </nav>
   </div>
