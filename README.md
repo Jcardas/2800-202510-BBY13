@@ -156,7 +156,7 @@ Users can log in to compete on a leaderboard and compare scores. Our goal is to 
 
 1. **Clone this repo**
 ```bash
-git clone https://github.com/your-username/isthismygrandson.git
+git clone https://github.com/Jcardas/2800-202510-BBY13.git
 cd isthismygrandson
 ```
 
